@@ -3,7 +3,7 @@
 ##  630-252-2305, yez@jlab.org
 
 In this code, both the unradiated (Born) Cross Section and the Radiated Cross Section are given.
-The DIS part of the Born Cross Section is based on Peter Bosted's F1F2IN09 model (coded in FORTRAN), and
+The DIS part of the Born Cross Section is based on the F2ALLM model, and
 the QE part is based on the F(y) scalling function with the parameters fitted from the
 Hall-C E02-019 data and Hall-A E08-014 data. These two models are default in the code,
 and a DIS model which was twisted for EMC study from Peter's F1F2IN06 fit is also given in the code and it is completely in C++.
