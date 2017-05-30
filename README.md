@@ -22,3 +22,5 @@ file if you want to add a new target included in the list.
 
 An example, Check_XS.C, is included in this file so you can understand how to make use
 of this code. Please feel free to ask me if you have any questions.
+
+## Note: I am cleaning up and optimizing the codes in the new folder "SRC_Clean/". It is an experimental version and will be changed frequently. 
