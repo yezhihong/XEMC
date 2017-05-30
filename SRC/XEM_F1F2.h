@@ -616,7 +616,7 @@ inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval)
   }	      // loop on iw
 
   // resonance height coefficients. xvals of 13-36
-  if(!aNum==12)
+  if(!(aNum==12))
     cerr <<"****** ERROR,A, aNum is incorrect"<<endl;
   
   for(int i=0;i<6;i++){
@@ -626,7 +626,7 @@ inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval)
     }
   }
   //  Non-Res coefficients xvals of 37-44
-  if(!aNum==36)
+  if(!(aNum==36))
     cerr <<"****** ERROR,B, aNum is incorrect"<<endl;
 
   for(int i=0;i<6;i++){

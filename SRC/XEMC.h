@@ -32,7 +32,7 @@ class XEMC
         /*}}}*/
 
 		XEMC(XEMC const&){};
-		XEMC& operator=(XEMC const&){};
+		//XEMC& operator=(XEMC const&){};
 
 		/*int Process(const double kE0, const double kEp, const double kTheta, const int kA, const int kZ){{{*/
 		int Process(const double kE0, const double kEp, const double kTheta, const int kA, const int kZ)
@@ -49,6 +49,60 @@ class XEMC
 			Event->Target.A = kA;
 			Event->Target.Z = kZ;
 			//And re-add materials for Win_Before/After_Mag with new angle setting
+			for(unsigned int ii=0;ii<Win_Before_Mag_Name.size();ii++)
+				Event->AddOneMaterial(Event->Win_Before_Mag, Win_Before_Mag_X0[ii], Win_Before_Mag_rho[ii],Win_Before_Mag_L[ii],Win_Before_Mag_A[ii],Win_Before_Mag_Z[ii],Win_Before_Mag_Name[ii].c_str());
+			for(unsigned int jj=0;jj<Win_After_Mag_Name.size();jj++)
+				Event->AddOneMaterial(Event->Win_After_Mag, Win_After_Mag_X0[jj], Win_After_Mag_rho[jj],Win_After_Mag_L[jj],Win_After_Mag_A[jj],Win_After_Mag_Z[jj],Win_After_Mag_Name[jj].c_str());
+			Event->reactz_gen = 0 - z0; //For foil targets, assume the reaction points are alwayl at the center
+			err=Event->Run();
+			if ( err==-1 ){
+				cerr << "********** Don't not success to calculate XS!!!"<<endl;
+				xs_rad = -1111.00;
+				xs_dis = -1112.00;
+				xs_qe = -1113.00;
+				xs_born = -2222.00;
+				tail = -1000.00;
+			}
+			else{
+				xs_born = Event->cs_Born;
+				xs_dis = Event->cs_dis;
+				xs_qe = Event->cs_qe;
+				tail = Event->tail;
+			}
+			xs_mott = Event->cs_M;
+
+			if ( IsDebug && err==0 )
+				Event->Print();
+
+			/*Finished Radiated Cross Section Calculation}}}*/
+			return 0;
+		}
+		/*}}}*/
+		
+                /*int Process(const double kE0, const double kEp, const double kTheta, const int kA,const int kZ, const TString kRadC){{{*/
+		int Process(const double kE0, const double kEp, const double kTheta, const int kA,const int kZ, const TString kRadC)
+		{ 
+			if(kE0>12.0||kEp>12.0){
+				cerr<<" *** Are you sure? E0 or Ep > 12GeV?!!! *** "<<endl;
+				return -1;
+			}
+			/*{{{ Intialize parameters and calculate Radiated Cross Section*/
+			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
+			Event->E_s=kE0*1000.;   //E0, in MeV
+			Event->E_p=kEp*1000.;   //Ep, in MeV
+			Event->theta=kTheta; //Theta, in Deg
+			Event->Target.A = kA;
+			Event->Target.Z = kZ;
+
+                        if(kRadC=="RadC On")
+                            Event->IsRadCor = 1;
+                        if(kRadC=="RadC Off")
+                            Event->IsRadCor = 0;
+                        else
+                            Event->IsRadCor = IsRadCor;
+
+
+                        //And re-add materials for Win_Before/After_Mag with new angle setting
 			for(unsigned int ii=0;ii<Win_Before_Mag_Name.size();ii++)
 				Event->AddOneMaterial(Event->Win_Before_Mag, Win_Before_Mag_X0[ii], Win_Before_Mag_rho[ii],Win_Before_Mag_L[ii],Win_Before_Mag_A[ii],Win_Before_Mag_Z[ii],Win_Before_Mag_Name[ii].c_str());
 			for(unsigned int jj=0;jj<Win_After_Mag_Name.size();jj++)

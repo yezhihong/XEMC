@@ -5,7 +5,7 @@
 //IMPORTANT: Define Target info
 ////////////////////////////////////////
 //Target Table: include two types of tables: Radiative Corrected and Non-Radiative Corrected  
-const TString TARGET_TABLE = "/work/halla/e08014/disk1/yez/XEMC/SRC/target.table";
+const TString TARGET_TABLE = "/Users/yez/work/github/XEMC/SRC/target.table";
 
 class XEM_TGT
 {

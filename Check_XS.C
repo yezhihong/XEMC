@@ -40,7 +40,7 @@ int getargs(int argc, char**argv);
 
 int main(int argc,char** argv){
 
-	Double_t xbj, cs_qe, cs_dis, cs_rad,cs_born;
+	Double_t xbj=0.0, cs_qe=0.0, cs_dis=0.0, cs_rad=0.0,cs_born=0.0;
 	TString Target;
 	int gerr = getargs(argc,argv);
 
@@ -63,7 +63,7 @@ int main(int argc,char** argv){
 	Int_t A=1; 
 	Int_t Z=0;
     //Basic input file, mostly important for radiated cross sections
-	TString Target_Input = Form("/work/halla/e08014/disk1/yez/Gen_XS_Table/input/%s_Input.dat",Target.Data());	
+	TString Target_Input = Form("/Users/yez/work/github/XEMC/input/%s_Input.dat",Target.Data());	
 
 	/*Set Target{{{*/
 	if(Target == "H2") {
@@ -97,7 +97,10 @@ int main(int argc,char** argv){
 		cs_dis = Event->XS_DIS();
 		cs_rad = Event->XS_Rad();
 		cs_born = Event->XS_Born();
-	}
+	}else{
+         cerr<<"*** ERROR, Something wrong with the XS calculation!!!"<<endl;
+        
+        }
 	delete Event;
 	cerr <<"------------------------------------------------------------------------"<<endl;
 	cerr <<"------------------------------------------------------------------------"<<endl;

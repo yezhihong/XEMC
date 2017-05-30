@@ -44,7 +44,7 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
   Double_t nu = aE0 - aEp;
   Double_t Qv2 = Qsq + nu*nu;
   Double_t Qv = sqrt(Qv2);
-  Double_t x_local = Qsq/2.0/P_MASS/nu;
+  //Double_t x_local = Qsq/2.0/P_MASS/nu;
   //Double_t y = nu/aEp;
   //Double_t Wsq = -Qsq + P_MASS*P_MASS + 2.0*P_MASS*nu;
   //Double_t Elastic_Peak = aE0/(1.0+2.0*aE0*SN_SQ/aTarget_Mass);
@@ -74,9 +74,10 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
   else 
     fact=0.0;
 
-  const Double_t Xbj_Max_He3 = 2.85; 
+  //const Double_t Xbj_Max_He3 = 2.85; 
   //if(aTarget->A==3 &&aTarget->Z==2 && x_local >= Xbj_Max_He3)
   if(aTarget->A==3 &&aTarget->Z==2) // New twist for He3 only, -- Z. Ye 05/19/2014
+  //if(0) // New twist for He3 only, -- remove this feature, Z. Ye 11/08/2016
 	  sig_out = fact*gGet_He3_Fy(y_cal,aTarget)*1e6;//Add a flat tail for He3 at y<0.80
   else
 	  sig_out = fact*gGet_Fy(y_cal,aTarget)*1e6;

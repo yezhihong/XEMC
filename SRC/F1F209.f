@@ -56,6 +56,7 @@ c subroutine F1F2QE09. Returns quasi-elastic F1, F2 for
 c      nucleus with charge Z and atomic number A
 c      for given value of Q2 and W**2
 c 
+      subroutine F1F2_Main
       implicit none
       integer iq,iw
       real*8 q2,w2,F1n,F2n,r,F1p,F2p,F1d,F2d,F1c,F2c
@@ -956,7 +957,8 @@ c new 5/07 values. Values 1 and 7 will be overridden below.
       sig = 0.
       if(w2.lt.1.07327**2 .or. w2.gt.25 .or. 
      >  q2.lt.0.0 .or. q2.gt.11.0) then
-        write(6,'(1x,''error, q2 or w2 out of range'',2f8.3)') w2,q2
+        !write(6,'(1x,''error, q2 or w2 out of range'',2f8.3)') w2,q2
+        sig=0.0
         return
       endif
 

@@ -336,12 +336,13 @@ inline Double_t gGet_He3_Fy(double vY, XEM_TGT* vTarget);
 inline void gGet_FF(int vFlag, double vQsq, double* vFF);
 inline Double_t gGet_Tail_Corr(Int_t kA,Double_t kX);
 
-//Subroutines in XEM_F1F2.h
-inline Double_t gGet_Resmod316(double aQsq, double aWsq, int aflag);
-//inline XEM_VAR4* gGet_Christy806(double aQsq, double aWsq);
-inline void gGet_Christy806(double aQsq, double aWsq,XEM_VAR4 *sig);
-inline Double_t gGet_NMC(double aXbj, double aQsq);
-inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq, double *aXval);
-inline Double_t gGet_Resd(double aQsq, double aWsq, double *aXval);
-inline void gGet_Pind(double aQsq, double aWsq,XEM_VAR4* sig);
+//Subroutines in XEM_F1F2.h/*{{{*/
+/*inline Double_t gGet_Resmod316(double aQsq, double aWsq, int aflag);*/
+////inline XEM_VAR4* gGet_Christy806(double aQsq, double aWsq);
+//inline void gGet_Christy806(double aQsq, double aWsq,XEM_VAR4 *sig);
+//inline Double_t gGet_NMC(double aXbj, double aQsq);
+//inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq, double *aXval);
+//inline Double_t gGet_Resd(double aQsq, double aWsq, double *aXval);
+/*inline void gGet_Pind(double aQsq, double aWsq,XEM_VAR4* sig);*/
+/*}}}*/
  

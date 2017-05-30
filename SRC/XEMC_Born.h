@@ -4,9 +4,9 @@
 /*   --Modified from Fortran version XEM  */
 /******************************************/
 #include "XEM_Main.h"
-#include "XEM_F1F2.h"
+//#include "XEM_F1F2.h"
 #include "XEM_Fy2Sig.h"
-#include "XEM_DIS.h"
+//#include "XEM_DIS.h"
 #include "XEM_SigCal.h"
 
 bool IsGoodFlag(int kflag){

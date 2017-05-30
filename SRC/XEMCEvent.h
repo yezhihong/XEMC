@@ -48,7 +48,7 @@ class XEMCEvent
 		/*}}}*/
 
 		XEMCEvent(XEMCEvent const&){};
-		XEMCEvent& operator=(XEMCEvent const&){};
+		//XEMCEvent& operator=(XEMCEvent const&){};
 
 		/*void Init(){{{*/
 		void Init()
@@ -115,10 +115,10 @@ class XEMCEvent
 			/*Set Beam Info(HCS and TCS){{{*/
 			//know beam_x,beam_y,reactz_gen,E_s,theta,HRS_L
 			//Set s,s_TCS,x_tg_gen,y_tg_gen,p_TCS,p_P,p_P_TCS
-			theta_rad=theta*DegToRad();//rad
+			theta_rad=theta*TMath::DegToRad();//rad
 			s(0)=beam_x; //beam offset, cm
 			s(1)=beam_y; //beam offset, cm
-			reactz_gen+=-(beam_x)*tan(T_theta*DegToRad());
+			reactz_gen+=-(beam_x)*tan(T_theta*TMath::DegToRad());
 			s(2)=reactz_gen;  //--Z. Ye, 09/11/2012
 			//s(2)=0.0;    //Assume reaction always happens at the center of the target, replace reactz_gen; //cm
 			target_edgepoint_TRCS(0)=theta/fabs(theta)*T_H/2;//if theta>0,T_H/2, if<0, -T_H/2 in Target Rotation Coordinate System(T_theta=0) not TCS, check Coordinate.svg
@@ -129,7 +129,7 @@ class XEMCEvent
 			lp_TRCS=s;
 			lp_TRCS(2)-=z0;
 			//Printf("s(%g,%g,%g),target_edgepoint_TRCS(%g,%g,%g),lp_TRCS(%g,%g,%g)",s(0),s(1),s(2),target_edgepoint_TRCS(0),target_edgepoint_TRCS(1),target_edgepoint_TRCS(2),lp_TRCS(0),lp_TRCS(1),lp_TRCS(2));
-			lp_TRCS.RotateY(-T_theta*DegToRad());
+			lp_TRCS.RotateY(-T_theta*TMath::DegToRad());
 
 			s_TCS=s;
 			s_TCS.RotateZ(PI/2);//passive ratation around HCS, so -(-PI/2)
@@ -164,7 +164,7 @@ class XEMCEvent
 
 			Angle=theta_rad;
 			Angle_Deg = theta;
-			//     Angle_Deg=Angle*RadToDeg();
+			//     Angle_Deg=Angle*TMath::RadToDeg();
 			sinsq_Angle=sin(Angle/2)*sin(Angle/2);
 			sinsq=sin(Angle/2)*sin(Angle/2);//sin(Angle/2)^2
 			//p_P_TCS=lz;//Now think it's in TCS
@@ -217,7 +217,7 @@ class XEMCEvent
 				lHL+=Win_Before_Mag[i].L;
 				//cerr<< Form("Win#%d, L=%f",i,Win_Before_Mag[i].L)<<endl;
 			}
-			double lphrad=theta_rad-T_theta*DegToRad();//scattering angle in y axis in TCS or x axis in TRCS
+			double lphrad=theta_rad-T_theta*TMath::DegToRad();//scattering angle in y axis in TCS or x axis in TRCS
 			//it doesn't I add atan(ph_tg_gen) since it's so small for target and windows
 
 			//Win_Before_Mag add Win_f
@@ -800,7 +800,7 @@ class XEMCEvent
 				//a=1.07A^1/3
 				//a is the root-mean-sqaure radium of the
 				//charge distribution
-				double lF;
+				double lF = 0.0;
 				//Phys.Rev.D 12,1884
 				//equ A18
 				double la=1.07*pow(Target.A,1/3.);
@@ -1042,7 +1042,7 @@ class XEMCEvent
 			t0=1+0.5772*(bta+btb);
 			t1=2*AP*(-14/9.+13*log(aQ2/ELECTRON_MASS/ELECTRON_MASS)/12.);
 			t2=-AP*log(E_s/E_p)*log(E_s/E_p)/2;
-			t3=AP*(PI*PI/6.-DiLog(1-sinsq_Angle));
+			t3=AP*(PI*PI/6.-TMath::DiLog(1-sinsq_Angle));
 			return t0+t1+t2+t3;
 		}
 		/*}}}*/
@@ -1374,7 +1374,7 @@ class XEMCEvent
 			//aEPS: nucleon interaction energy
 			double GAMR=120; //no idea
 			double PFR=230; //no idea
-			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*DegToRad()/2),2); //no idea
+			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*TMath::DegToRad()/2),2); //no idea
 			double QVSRQ=QMSRQ+115*115; //no idea
 			double AP0=840; //no idea
 			double AP1=750; //no idea
@@ -1386,7 +1386,7 @@ class XEMCEvent
 				AP=AP0+(aA-1)*(AP1-AP0)/3;
 			else
 				AP=AP1;
-			double lth=aTheta*DegToRad();
+			double lth=aTheta*TMath::DegToRad();
 			double lQ2=4*aE*(aE-aomega)*sin(lth/2)*sin(lth/2);
 			double lq3mSQ=lQ2+aomega*aomega;
 
@@ -1447,9 +1447,9 @@ class XEMCEvent
 			//double AP1=750; //no idea
 			double GAMR=120; //no idea
 			double PFR=230; //no idea
-			double QMSR=4.*730.*(730.-390.)*pow(sin(37.1*DegToRad()/2.),2);
+			double QMSR=4.*730.*(730.-390.)*pow(sin(37.1*TMath::DegToRad()/2.),2);
 			double QVSR=QMSR+390.*390;
-			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*DegToRad()/2),2); //no idea
+			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*TMath::DegToRad()/2),2); //no idea
 			double QVSRQ=QMSRQ+115*115; //no idea
 			double QFDP=1.02e-7;//no idea
 			double GAMSPRD=140;
@@ -1474,7 +1474,7 @@ class XEMCEvent
 				GSPRDA=GAMSPRD;
 				AD=AD1;
 			}
-			double lth=aTheta*DegToRad();
+			double lth=aTheta*TMath::DegToRad();
 			double lQ2=4*aE*(aE-aomega)*sin(lth/2)*sin(lth/2);
 			double lq3mSQ=lQ2+aomega*aomega;
 			double result;
@@ -1493,7 +1493,7 @@ class XEMCEvent
 			result*=pow(FD(lQ2,AD),2)/pow(FD(QMSR,AD),2);
 			result*=lq3mSQ/QVSR;
 			result*=(lQ2/2./lq3mSQ+tan(lth/2.)*tan(lth/2));
-			result/=(QMSR/2./QVSR+pow(tan(37.1*DegToRad()/2.),2));
+			result/=(QMSR/2./QVSR+pow(tan(37.1*TMath::DegToRad()/2.),2));
 			result*=sigma_M(aE,aTheta)/sigma_M(730,37.1);
 			double WTHRESH = 4.*aE*aE*sin(lth/2.)*sin(lth/2.)+PI_MASS*PI_MASS+2.*PI_MASS*PROTON_MASS;
 			WTHRESH /= 2.*PROTON_MASS;
@@ -1560,7 +1560,7 @@ class XEMCEvent
 		double sigma_2N(const int& aZ,const double& aA,const double& aE,const double& aomega,const double& aTheta,const double& aPF)
 		{
 			//Dip region
-			double lth=aTheta*DegToRad();
+			double lth=aTheta*TMath::DegToRad();
 			double DM=1232.;
 			double A2=550.;
 			//  double PFR=60.;
@@ -1569,10 +1569,10 @@ class XEMCEvent
 			double GAMREF=300.;
 			double GAMR=GAMREF;
 			double SIGREF=0.20e-7;
-			double QMSR=4.*596.8*(596.8-380.)*pow(sin(60.*DegToRad()/2.),2);
+			double QMSR=4.*596.8*(596.8-380.)*pow(sin(60.*TMath::DegToRad()/2.),2);
 			double QVSR=QMSR+380.*380;
 			double SIGKIN=0.5*sigma_M(596.8e0,60.);
-			SIGKIN=SIGKIN*(QMSR/2./QVSR+pow(tan(60.*DegToRad()/2.),2));
+			SIGKIN=SIGKIN*(QMSR/2./QVSR+pow(tan(60.*TMath::DegToRad()/2.),2));
 			SIGKIN=SIGKIN*QVSR*pow(FD(QMSR,A2),2);
 			SIGKIN=SIGKIN*GAMR/GAMREF;
 			double SIGCON=SIGREF/SIGKIN;
@@ -1606,13 +1606,13 @@ class XEMCEvent
 		double sigma_resonance(const double& aRes_Energy,const double& aA,const double& aZ,const double& aE,const double& aomega,const double& aTheta,const double& aPF)
 		{
 			//resonace
-			double lth=aTheta*DegToRad();
+			double lth=aTheta*TMath::DegToRad();
 			double PFR=230.;
 			double EPSR=0.;
-			double AR0;
-			double AR1;
-			double QFRP;
-			double VPHOTONE;
+			double AR0=0.;
+			double AR1=0.;
+			double QFRP=0.;
+			double VPHOTONE=0.;
 			if ( fabs(aRes_Energy-1500)<1e-3 )
 			{
 				AR0=1000.;
@@ -1631,12 +1631,12 @@ class XEMCEvent
 			double GAMSPRD=140.;
 			double GAMR=110.;
 			double GAMPI=5.;
-			double QMSQFR=4.*730.*(730.-115.)*pow(sin(37.1*DegToRad()/2.),2);
+			double QMSQFR=4.*730.*(730.-115.)*pow(sin(37.1*TMath::DegToRad()/2.),2);
 			double QVSQFR=QMSQFR+115.*115;
-			double QMSRR=4.*10000.*(10000.-VPHOTONE)*pow(sin(6.*DegToRad()/2.),2);
+			double QMSRR=4.*10000.*(10000.-VPHOTONE)*pow(sin(6.*TMath::DegToRad()/2.),2);
 			double QVSRR=QMSRR+VPHOTONE*VPHOTONE;
 			double SIGREF=pow(FD(QMSRR,AR0),2)*QVSRR;
-			SIGREF=SIGREF*(QMSRR/2./QVSRR+pow(tan(6.*DegToRad()/2.),2));
+			SIGREF=SIGREF*(QMSRR/2./QVSRR+pow(tan(6.*TMath::DegToRad()/2.),2));
 			SIGREF=SIGREF*sigma_M(10000.e0,6.);
 			int NA=int(aA);
 			double QFR,GSPRDA,AR;
@@ -1734,7 +1734,7 @@ class XEMCEvent
 		/*double Recoil(const double& aE,const double& aTheta,const double& aM){{{*/
 		double Recoil(const double& aE,const double& aTheta,const double& aM)
 		{
-			return 1/(1+aE*(1-cos(aTheta*DegToRad()))/aM);
+			return 1/(1+aE*(1-cos(aTheta*TMath::DegToRad()))/aM);
 		}
 		/*}}}*/
 
@@ -1935,7 +1935,7 @@ class XEMCEvent
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"beam_y",    10,beam_y,    8,"cm",            40,"(Beam Y)");
 
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"Angle",     10,Angle,     8,"rad",           40,"(real scattering angle[rad])");
-			printf("%-*s=%*.2f %-*s %-*s\n",15,"Angle",     10,Angle*RadToDeg(),     9,"\xc2\xb0",           40,"(real scattering angle[deg])");
+			printf("%-*s=%*.2f %-*s %-*s\n",15,"Angle",     10,Angle*TMath::RadToDeg(),     9,"\xc2\xb0",           40,"(real scattering angle[deg])");
 			printf("%-*s=%*.2e %-*s %-*s\n",15,"Q2",        10,Q2,        9,"MeV\xc2\xb2",   40,"(Q\xc2\xb2)");
 			printf("%-*s=%*.2e %-*s %-*s\n",15,"q2",        10,q2,        9,"MeV\xc2\xb2",   40,"(-Q\xc2\xb2)");
 			printf("%-*s=%*.2e %-*s %-*s\n",15,"btr",       10,btr,       8,"rad_len",       40,"(b*tr equivalent radiator unit in rad_len)");

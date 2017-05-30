@@ -16,12 +16,19 @@ RTLIBS := -L${ROOTSYS}/lib -lCore -lgfortran # /usr/lib/libg2c.so.0 #use /usr/li
 #RTLIBS := -L${ROOTSYS}/lib -lCore  /usr/lib/libg2c.so.0 #use /usr/lib64/ for ifarm
 all: $(PROGRAM)
 
-$(PROGRAM): $(PROGRAM).o
-	#g++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) 
-	clang++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) 
+GFORTRAN := gfortran
+#GFORTRAN := f77
+#FFLAGS = -C -g -m32 -fbounds-check -finit-local-zero -fno-automatic 
+FFLAGS = -C -g -m64 -fbounds-check -finit-local-zero -fno-automatic # use -m64 on ifarm, which is a 64bit system
+
+${XEMCDIR}/SRC/F1F209.o: ${XEMCDIR}/SRC/F1F209.f 
+	rm -f $@
+	cd ${XEMCDIR}/SRC ; $(GFORTRAN) $(FFLAGS) -c F1F209.f;
+
+$(PROGRAM): $(PROGRAM).o $(XEMCDIR)/SRC/F1F209.o
+	clang++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) $(XEMCDIR)/SRC/F1F209.o 
 
 $(PROGRAM).o: $(PROGRAM).C
-	#g++ $(CFLAGS) -c -o $(PROGRAM).o $(PROGRAM).C ${INCLUDE}
 	clang++ $(CFLAGS) -c -o $(PROGRAM).o $(PROGRAM).C ${INCLUDE}
 
 clean:
