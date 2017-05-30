@@ -517,7 +517,7 @@ class XEMCEvent
 				cs_Born=cs_qfs+cs_del+cs_x+cs_r1500+cs_r1700+cs_2N;
 			}
 			else{ //ZYE
-				//Born Cross Section Model from XEM, Last Option : 1->QE+DIS_F1F2IN09, 2->QE Only, 3->DIS_F1F2IN09 only 4->DIS_F1F2IN06_XEM Only
+				//Born Cross Section Model from XEM, Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only 4->DIS_F1F2IN06_XEM Only
 				cs_qe = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),2); 
 				cs_dis = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),3); 
 				cs_Born = cs_qe + cs_dis; 
@@ -1022,8 +1022,8 @@ class XEMCEvent
 			}
 			else{
 				//Born Cross Section Model from XEM, 
-				//Last Option : 1->QE+DIS_F1F2IN09, 2->QE Only, 3->DIS_F1F2IN09 only, 4->DIS_F1F2IN06 Only,
-				//              5->QE_DIS+F1F2IN09+Coulomb Correction
+				//Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only, 4->DIS_F1F2IN06 Only,
+				//              5->QE_DIS+F2ALLM+Coulomb Correction
 				lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),5);
 			}
 			/*}}}*/

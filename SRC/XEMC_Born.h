@@ -10,8 +10,6 @@
 #include "XEM_SigCal.h"
 
 bool IsGoodFlag(int kflag){
-	// Add #4, Calculate Rad Integral with smaller steps to save time
-	// Add #5, Calculate Rad Integral with QE+F1F2IN09+Coulomb Effect 
   if(kflag==1||kflag==2||kflag==3||kflag==4||kflag==5) 
     return kTRUE;
   else
@@ -40,7 +38,7 @@ Double_t XEMC_Born(double iE0set, double iEpset, double iTheta, int iA,int iZ,in
 //  if(IsDebug)
 //      iTarget->Print();
 
-  //iFlag =1->QE+DIS, iFlag=2->QE Only, iFlag=3->DIS Only (F1F2IN09), iFlag==4->DIS Only (F1F2IN06) 
+  //iFlag =1->QE+DIS, iFlag=2->QE Only, iFlag=3->DIS Only (F1F2IN09 or F2ALLM), iFlag==4->DIS Only (F1F2IN06) 
   XEM_XS* XS_Born = new XEM_XS();  
 
   if(IsGoodFlag(iFlag)) 
