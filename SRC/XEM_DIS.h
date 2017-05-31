@@ -1,4 +1,3 @@
-#include "XEM_Target.h"
 inline void gCal_DIS(double kE0,double kEp,double kTheta, XEM_TGT* kTarget,double kPmax, int kInnt, int kInnp,XEM_SIG* sig)
 {
 	/*
@@ -211,8 +210,8 @@ inline void gCal_DIS(double kE0,double kEp,double kTheta, XEM_TGT* kTarget,doubl
 
 				Double_t W1a = 2*TMath::Pi()*(Z*W1P + N*W1N);
 				Double_t W2a = 2*TMath::Pi()*(Z*W2P + N*W2N);
-				Double_t sigm = CS_Theta*Alpha/(2.0*SN_SQ*kE0);
-				sigm = pow(HBARC_XEM*sigm*MeVToGeV,2);
+				Double_t sigm = CS_Theta*ALPHA/(2.0*SN_SQ*kE0);
+				sigm = pow(HBARC*sigm*MeVToGeV,2);
 
 				sig->Value = 1e4*sigm*(W2a+2.0*W1a*TN_SQ);
 				sig->Factor=0.0; //No in Use in this subroutine

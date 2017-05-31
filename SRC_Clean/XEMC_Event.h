@@ -9,8 +9,6 @@
 //  generation and info related to HRS forward and back   //
 //  -ward reconstruction, etc.                            //
 ////////////////////////////////////////////////////////////
-#include "XEMC_Const.h"
-#include "XEMC_Born.h"
 
 #define MSIZE 5
 /*struct Material{{{*/
@@ -65,7 +63,7 @@ class XEMCEvent
 			SetTarget();//Define Target Materials, like Windowns and Chambers
 			Num_Event_Add=CalcXS();//Calculate Cross Sections
 
-			return 0;
+			return Num_Event_Add;
 		}
 		/*}}}*/
 
@@ -517,7 +515,7 @@ class XEMCEvent
 				cs_Born=cs_qfs+cs_del+cs_x+cs_r1500+cs_r1700+cs_2N;
 			}
 			else{ //ZYE
-				//Born Cross Section Model from XEM, Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only 
+				//Born Cross Section Model from XEM, Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only 4->DIS_F1F2IN06_XEM Only
 				cs_qe = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),2); 
 				cs_dis = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),3); 
 				cs_Born = cs_qe + cs_dis; 
@@ -1022,9 +1020,9 @@ class XEMCEvent
 			}
 			else{
 				//Born Cross Section Model from XEM, 
-				//Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only
-				//              4->QE_DIS+F2ALLM+Coulomb Correction
-				lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),4);
+				//Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only, 4->DIS_F1F2IN06 Only,
+				//              5->QE_DIS+F2ALLM+Coulomb Correction
+				lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),5);
 			}
 			/*}}}*/
 			return _F(lQ2)*lsigma_q;

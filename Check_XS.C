@@ -63,7 +63,7 @@ int main(int argc,char** argv){
 	Int_t A=1; 
 	Int_t Z=0;
     //Basic input file, mostly important for radiated cross sections
-	TString Target_Input = Form("/Users/yez/work/github/XEMC/input/%s_Input.dat",Target.Data());	
+	TString Target_Input = Form("./input/%s_Input.dat",Target.Data());	
 
 	/*Set Target{{{*/
 	if(Target == "H2") {
@@ -89,6 +89,7 @@ int main(int argc,char** argv){
 	//Define a event to calculate radiated cross section
 	XEMC* Event = new XEMC(); 
 	Event->Init(Target_Input.Data());
+    Event->SetTargetTable("./target.table");
 	Int_t err = -1;
 
 	err = Event->Process(E0,Ep,Theta,A,Z,0.0);	

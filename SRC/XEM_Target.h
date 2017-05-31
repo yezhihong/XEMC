@@ -3,9 +3,9 @@
 #define U2GeV  0.931494028       //Convert from atomic mass unit to GeV unit   
 ////////////////////////////////////////
 //IMPORTANT: Define Target info
-////////////////////////////////////////
+//const TString TARGET_TABLE = "/Users/yez/work/github/XEMC/SRC/target.table";
 //Target Table: include two types of tables: Radiative Corrected and Non-Radiative Corrected  
-const TString TARGET_TABLE = "/Users/yez/work/github/XEMC/SRC/target.table";
+////////////////////////////////////////
 
 class XEM_TGT
 {

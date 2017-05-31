@@ -9,8 +9,6 @@
 //  generation and info related to HRS forward and back   //
 //  -ward reconstruction, etc.                            //
 ////////////////////////////////////////////////////////////
-#include "XEMC_Const.h"
-#include "XEMC_Born.h"
 
 #define MSIZE 5
 /*struct Material{{{*/
@@ -65,7 +63,7 @@ class XEMCEvent
 			SetTarget();//Define Target Materials, like Windowns and Chambers
 			Num_Event_Add=CalcXS();//Calculate Cross Sections
 
-			return 0;
+			return Num_Event_Add;
 		}
 		/*}}}*/
 

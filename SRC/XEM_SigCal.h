@@ -49,8 +49,6 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   XEM_VAR3 *F = new XEM_VAR3(); //store F1,F2,RC values
   XEM_VAR2 *W = new XEM_VAR2(); //store W1,W2 values
 
-  Double_t Qsq=-1000.,xbj=-1000.,nu=-1000.,y=-1000.,Wsq=-1000.,Elastic_Peak=-1000.;
-
   /*Coulomb Correction{{{*/
   //Get DeltaE value 
   Double_t DeltaE = 0.0;
@@ -97,21 +95,6 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   Double_t E0_cc = kE0 + DeltaE;
   Double_t Ep_cc = kEp + DeltaE;
 
-  //Define a Structure class to keep additional target info, such as Fermi Motion and Seperation Energy
-  Double_t SN_Theta = sin(kTheta/2.0);
-  Double_t SN_SQ = SN_Theta*SN_Theta;
-  //Double_t CS_Theta = cos(kTheta/2.0);
-  //Double_t TN_Theta = tan(kTheta/2.0);
-  //Double_t CS_SQ = CS_Theta*CS_Theta;
-  
-  Double_t aTarget_Mass = kTarget->Mass;
-  Qsq = 4.0*E0_cc*Ep_cc*SN_SQ;
-  nu = E0_cc - Ep_cc;
-  xbj = Qsq/2.0/P_MASS/nu;
-  y = nu/Ep_cc;
-  Wsq = -Qsq + P_MASS*P_MASS + 2.0*P_MASS*nu;
-  Elastic_Peak = E0_cc/(1.0+2.0*E0_cc*SN_SQ/aTarget_Mass);
-    
   if(kFlag==1 || kFlag ==2 || kFlag ==5){
     if(kTarget->A > 1.5)
       gCal_Fy2Sig(E0_cc,Ep_cc,kTheta,kTarget,Sig_QE);
@@ -125,6 +108,21 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
 
       /*OLD DIS FIT{{{*/
       /*      if(kFlag==4){*/
+      //Double_t SN_Theta = sin(kTheta/2.0);
+      //Double_t SN_SQ = SN_Theta*SN_Theta;
+      //Double_t CS_Theta = cos(kTheta/2.0);
+      //Double_t TN_Theta = tan(kTheta/2.0);
+      //Double_t CS_SQ = CS_Theta*CS_Theta;
+
+      //Double_t aTarget_Mass = kTarget->Mass;
+      //Double_t Qsq = 4.0*E0_cc*Ep_cc*SN_SQ;
+      //Double_t nu = E0_cc - Ep_cc;
+      //Double_t xbj = Qsq/2.0/P_MASS/nu;
+      //Double_t y = nu/Ep_cc;
+      //Double_t Wsq = -Qsq + P_MASS*P_MASS + 2.0*P_MASS*nu;
+      //Double_t Elastic_Peak = E0_cc/(1.0+2.0*E0_cc*SN_SQ/aTarget_Mass);
+
+
       //Double_t EMC_Corr=-1000., Frac=-1000.;
       //Double_t pmax=1.0;
       //Double_t x1 = 0.8, x2 = 0.9;

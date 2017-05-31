@@ -61,33 +61,13 @@
 //#include <THaRun.h>
 //#include <THaEvent.h>
 //*}}}*/
-#include "XEM_Target.h"
 
 using namespace std;
+
+TString TARGET_TABLE = "/work/halla/e08014/disk1/yez/XEMC/SRC/target.table";
+#include "XEM_Target.h"
   
-  
-/*Constants{{*/
-//const Double_t Na=TMath::Na();           //Avogadro's Number
-//const Double_t Qe=TMath::Qe();
-const Double_t GeVToMeV = 1000.0; 
-const Double_t MeVToGeV = 0.001;
-const Double_t PION_MASS = 0.135;          //GeV Mass of Pion
-const Double_t E_MASS = 0.510999*MeVToGeV; //Electron Mass
-const Double_t P_MASS = 0.938272;          //Proton Mass
-const Double_t N_MASS = 0.939565;          //Neutron Mass
-const Double_t D_MASS = 1.8756;            //Deutrilium mass
-const Double_t PM_SQ = P_MASS*P_MASS;      //:->
-const Double_t NM_SQ = N_MASS*N_MASS;      //:->
-const Double_t PI_SQ = PION_MASS*PION_MASS;//:->
-const Double_t UToGeV = 0.931494028;       //Convert from atomic mass unit to GeV unit
-const Double_t Alpha=1/137.036;
-const Double_t META = 0.547;
-const Double_t HC_SQ = 0.3893857;          //mB/sR, Look like is different with MEV2SR_TO_NBARNSR, FIX_HERE
-const Double_t HBARC_XEM=197.33;           //hbar*c=197.33 MeV^2 fm^2
-//const Double_t FM2TONBARN=1e-7;          //1 fm^2=1e7 nbarn
-//const Double_t MEV2SR_TO_NBARNSR=HBARC*HBARC*FM2TONBARN; //default cross section 1/(MeV^2*sr) to nbarn/sr
-  
-class XEM_VAR2
+class XEM_VAR2/*{{{*/
 {
  public:
   XEM_VAR2()
@@ -121,9 +101,9 @@ class XEM_VAR2
     Printf("%-*s%f",20,"First Value:  ",First);
     Printf("%-*s%f",20,"Second Value:  ",Second);
   };
-};
+};/*}}}*/
 
-class XEM_VAR3
+class XEM_VAR3/*{{{*/
 {
  public:
   XEM_VAR3()
@@ -162,9 +142,9 @@ class XEM_VAR3
     Printf("%-*s%f",20,"Second Value:  ",Second);
     Printf("%-*s%f",20,"Third Value:  ",Third);
   };
-};
+};/*}}}*/
 
-class XEM_VAR4
+class XEM_VAR4/*{{{*/
 {
  public:
   XEM_VAR4()
@@ -209,10 +189,9 @@ class XEM_VAR4
     Printf("%-*s%f",20,"Forth Value:  ",Forth);
 
   };
-};
+};/*}}}*/
 
-
-class XEM_SIG
+class XEM_SIG/*{{{*/
 {
  public:
   XEM_SIG()
@@ -251,9 +230,9 @@ class XEM_SIG
     Printf("%-*s%f",20,"Factor:  ",Factor);
     Printf("%-*s%f",20,"Plus:  ",Plus);
   };
-};
+};/*}}}*/
 
-class XEM_XS
+class XEM_XS/*{{{*/
 {
  public:
   XEM_XS()
@@ -307,11 +286,9 @@ class XEM_XS
     Printf("%-*s%e",20,"All:  ",All);
     Printf("%-*s%f",20,"Factor:  ",Factor);
   };
-};
-  
+};/*}}}*/
 
-
-inline Double_t gGet_Max(double a, double b){
+inline Double_t gGet_Max(double a, double b){/*{{{*/
   if(a>=b)
     return a;
   else if(a<b)
@@ -320,8 +297,7 @@ inline Double_t gGet_Max(double a, double b){
     cerr <<"****** Can not make MAX(a,b) right! Check a and b !!!"<<endl;
     return 0;
   } 
-}
-
+}/*}}}*/
 
 //Subroutines in XEM_SigCal.h
 inline Double_t gGet_EMC_Func(Int_t aA, Double_t aXbj);

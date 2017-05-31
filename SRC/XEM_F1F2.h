@@ -1,4 +1,4 @@
-#include "XEM_Constant.h"
+#include "XEM_Num.h"
 extern "C"
 {
  void f1f2in09_(const double*,const double*, const double*, const double*, double*, double*, double*);
@@ -184,8 +184,8 @@ inline void gGet_Christy806(double aQsq, double aWsq, XEM_VAR4 *sig)
       aSigT = gGet_Resmod316(aQsq,aWsq,1);
       aSigL = gGet_Resmod316(aQsq,aWsq,2);
 
-      aF1 = aSigT*(aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/Alpha/(HC_SQ*GeVToMeV);
-      aFL = aSigL*2.0*xb*(aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/Alpha/(HC_SQ*GeVToMeV);
+      aF1 = aSigT*(aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/ALPHA/(HC_SQ*GeVToMeV);
+      aFL = aSigL*2.0*xb*(aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/ALPHA/(HC_SQ*GeVToMeV);
       aR = aFL/(2.0*xb*aF1);
       //Why we need this?! FIX_HERE
       aNu = aQsq/2.0/P_MASS/xb;
@@ -669,7 +669,7 @@ inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval)
   sig = sig_res + sig_nr; 
        
   // changed to use F1 instead of sigt
-  F1 = sig * (aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/Alpha/(HC_SQ*GeVToMeV);
+  F1 = sig * (aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/ALPHA/(HC_SQ*GeVToMeV);
   sig = F1;
   xb = Q2/(aWsq+Q2-PM_SQ);
   nu = Q2/P_MASS/2.0/xb;

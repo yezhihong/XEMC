@@ -3,11 +3,10 @@
 /*         Zhihong Ye, 01/11/2012         */
 /*   --Modified from Fortran version XEM  */
 /******************************************/
-#include "XEM_Main.h"
-//#include "XEM_F1F2.h"
 #include "XEM_Fy2Sig.h"
-//#include "XEM_DIS.h"
 #include "XEM_SigCal.h"
+//#include "XEM_F1F2.h"
+//#include "XEM_DIS.h"
 
 bool IsGoodFlag(int kflag){
   if(kflag==1||kflag==2||kflag==3||kflag==4||kflag==5) 

@@ -3,7 +3,10 @@
 //      XEMC Radiation Cross Section Model                //
 //        -- Zhihong Ye, 06/18/2012                       //
 ////////////////////////////////////////////////////////////
-#include "XEMCEvent.h"
+#include "XEMC_Main.h"
+#include "XEMC_Const.h"
+#include "XEMC_Born.h"
+#include "XEMC_Event.h"
 
 class XEMC
 {
@@ -457,6 +460,10 @@ class XEMC
 		}
 		/*}}}*/
 		/*}}}*/
+
+        void SetTargetTable(TString kTargetTable){/*{{{*/
+             TARGET_TABLE = kTargetTable;       
+        }/*}}}*/
 
 		/*Clear some variables if needed to re-initialize{{{*/
         void Clear(){

@@ -226,7 +226,7 @@ inline void gGet_Sig_Bar_DF(double vE0,double vEp,double vTheta, double vY,doubl
   Double_t vYp = vY*vY + vPt*vPt;
 
   //Calculate Mott Cross Section, Final Energy of Struck nulceon
-  Double_t sig_mott =  HC_SQ*pow(Alpha*CS_Theta,2)/pow(2.0*vE0*SN_SQ,2);
+  Double_t sig_mott =  HC_SQ*pow(ALPHA*CS_Theta,2)/pow(2.0*vE0*SN_SQ,2);
   Double_t En_Final = sqrt(PM_SQ+Qv2+vYp+2.0*Qv*vY); 
   Double_t E_Bar = sqrt(vYp+PM_SQ);
   Double_t Qsq_Bar = Qv2 - pow((En_Final-E_Bar),2);

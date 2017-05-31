@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////
-//  An example to calculate Cross Section 
+// Generate Cross Section Look-up Table
 //  --Zhihong Ye, 07/03/2012
 ////////////////////////////////////////////////
 /*Include{{{*/
@@ -19,6 +19,7 @@
 //#include <iterator>
 //from root
 #include <TMath.h>
+#include <TCanvas.h>
 #include <TRandom3.h>
 #include <TLorentzVector.h>
 #include <TMatrix.h>
@@ -29,6 +30,7 @@
 using namespace::std;
 using namespace::TMath;
 #include "XEMC.h"
+//#include "/work/halla/e08014/disk1/yez/XEMC/SRC/XEMC.h"
 char* gTarget;
 Double_t E0=-1.0;   //GeV
 Double_t Ep=-1.0;   //GeV
@@ -38,7 +40,7 @@ int getargs(int argc, char**argv);
 
 int main(int argc,char** argv){
 
-	Double_t xbj, cs_rad,cs_born;
+	Double_t xbj=0.0, cs_qe=0.0, cs_dis=0.0, cs_rad=0.0,cs_born=0.0;
 	TString Target;
 	int gerr = getargs(argc,argv);
 
@@ -49,7 +51,7 @@ int main(int argc,char** argv){
 		Target = gTarget;
 	}
 	if(bAsk){
-		cerr<<" Target (H2,He3,He4,C12,Ca40,Ca48) = "; cin >> Target;
+		cerr<<" Target (H2,He3,He4,C12,Al,Ca40,Ca48) = "; cin >> Target;
 		cerr<<" E0 (GeV/c) = "; cin >> E0;
 		cerr<<" Ep (GeV/c) = "; cin >> Ep;
 		cerr<<" Theta (Degree) = "; cin >> Theta;	
@@ -60,8 +62,8 @@ int main(int argc,char** argv){
 
 	Int_t A=1; 
 	Int_t Z=0;
-
-	TString Target_Input = Form("/w/halla-2/e08014/yez/Gen_XS_Table/input/%s_Input.dat",Target.Data());	
+    //Basic input file, mostly important for radiated cross sections
+	TString Target_Input = Form("./input/%s_Input.dat",Target.Data());	
 
 	/*Set Target{{{*/
 	if(Target == "H2") {
@@ -72,6 +74,8 @@ int main(int argc,char** argv){
 		A = 4; Z = 2;}
 	else if(Target == "C12") { 
 		A = 12; Z = 6;}
+	else if(Target == "Al") { 
+		A = 27; Z = 13;}
 	else if(Target == "Ca40") {
 		A = 40; Z = 20;}
 	else if(Target == "Ca48") {
@@ -85,16 +89,27 @@ int main(int argc,char** argv){
 	//Define a event to calculate radiated cross section
 	XEMC* Event = new XEMC(); 
 	Event->Init(Target_Input.Data());
+    Event->SetTargetTable("./target.table");
 	Int_t err = -1;
 
 	err = Event->Process(E0,Ep,Theta,A,Z,0.0);	
 	if(err>=0){
+		cs_qe = Event->XS_QE();
+		cs_dis = Event->XS_DIS();
 		cs_rad = Event->XS_Rad();
 		cs_born = Event->XS_Born();
-	}
+	}else{
+         cerr<<"*** ERROR, Something wrong with the XS calculation!!!"<<endl;
+        
+        }
 	delete Event;
-	cerr << Form("For Ep=%f, Theta=%f, xbj=%f, XS_Born = %e, XS_Rad = %e", Ep, Theta, xbj, cs_born,cs_rad)<<endl;
-
+	cerr <<"------------------------------------------------------------------------"<<endl;
+	cerr <<"------------------------------------------------------------------------"<<endl;
+	cerr << Form("For Ep=%f, Theta=%f, xbj=%f, Q2=%f", Ep, Theta, xbj, Q2)<<endl;
+	cerr <<"------------------------------------------------------------------------"<<endl;
+	cerr << Form("@@@ XS_QE = %e, XS_DIS = %e, XS_Born = %e, XS_Rad = %e", cs_qe, cs_dis, cs_born,cs_rad)<<endl;
+	cerr <<"------------------------------------------------------------------------"<<endl;
+	cerr <<"------------------------------------------------------------------------"<<endl;
 	return 0;
 }
 

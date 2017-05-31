@@ -3,9 +3,10 @@
 /*         Zhihong Ye, 01/11/2012         */
 /*   --Modified from Fortran version XEM  */
 /******************************************/
-#include "XEM_Main.h"
 #include "XEM_Fy2Sig.h"
 #include "XEM_SigCal.h"
+//#include "XEM_F1F2.h"
+//#include "XEM_DIS.h"
 
 bool IsGoodFlag(int kflag){
   if(kflag==1||kflag==2||kflag==3||kflag==4||kflag==5) 
@@ -36,7 +37,7 @@ Double_t XEMC_Born(double iE0set, double iEpset, double iTheta, int iA,int iZ,in
 //  if(IsDebug)
 //      iTarget->Print();
 
-  //iFlag =1->QE+DIS, iFlag=2->QE Only, iFlag=3->DIS Only (F1F2IN09 or F2ALLM), iFlag==4->QE+DIS+Comlumb Correction
+  //iFlag =1->QE+DIS, iFlag=2->QE Only, iFlag=3->DIS Only (F1F2IN09 or F2ALLM), iFlag==4->DIS Only (F1F2IN06) 
   XEM_XS* XS_Born = new XEM_XS();  
 
   if(IsGoodFlag(iFlag)) 
