@@ -463,6 +463,7 @@ class XEMC
 
         void SetTargetTable(TString kTargetTable){/*{{{*/
              TARGET_TABLE = kTargetTable;       
+             cout<<"---> Set the Target Table for Fy Func: "<<kTargetTable.Data()<<endl;
         }/*}}}*/
 
 		/*Clear some variables if needed to re-initialize{{{*/

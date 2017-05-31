@@ -51,7 +51,7 @@ int main(int argc,char** argv){
 		Target = gTarget;
 	}
 	if(bAsk){
-		cerr<<" Target (H2,He3,He4,C12,Al,Ca40,Ca48) = "; cin >> Target;
+		cerr<<" Target (H2,H3, He3,He4,C12,Al,Ca40,Ca48) = "; cin >> Target;
 		cerr<<" E0 (GeV/c) = "; cin >> E0;
 		cerr<<" Ep (GeV/c) = "; cin >> Ep;
 		cerr<<" Theta (Degree) = "; cin >> Theta;	
@@ -68,8 +68,10 @@ int main(int argc,char** argv){
 	/*Set Target{{{*/
 	if(Target == "H2") {
 		A = 2; Z = 1;}
-	else if(Target == "He3") {
-		A = 3; Z = 2;}
+	else if(Target == "H3") {
+		A = 3; Z = 1;}
+    else if(Target == "He3") {
+        A = 3; Z = 2;}
 	else if(Target == "He4") {
 		A = 4; Z = 2;}
 	else if(Target == "C12") { 
@@ -151,7 +153,7 @@ int getargs(int argc,char** argv){
 					cerr <<"-E[GeV]  Beam Energy" <<endl;
 					cerr <<"-P[GeV]  Scattering Momentum" <<endl;
 					cerr <<"-A[Deg]  Scattering Angle"<<endl;
-					cerr <<"-T[H2,He3,He4,C12,Ca40,Ca48,...]  Target Name" <<endl;
+					cerr <<"-T[H2,H3, He3,He4,C12,Ca40,Ca48,...]  Target Name" <<endl;
 					cerr <<endl<<"================================================"<<endl;
 					noStop=false;
 					err=-1;
