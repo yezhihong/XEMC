@@ -12,10 +12,8 @@ XEMCDIR=/work/halla/triton/yez/XEMC
 
 CFLAGS += -Wall -g
 INCLUDE := -I${ROOTSYS}/include -I$(XEMCDIR)/SRC
-RTLIBS := -L${ROOTSYS}/lib -lCore -lgfortran # /usr/lib/libg2c.so.0 #use /usr/lib64/ for ifarm
-#RTLIBS := -L${ROOTSYS}/lib -lCore ${x2}/mylib/libg2c.so.0 # /usr/lib/libg2c.so.0 #use /usr/lib64/ for ifarm
-#RTLIBS := -L${ROOTSYS}/lib -lCore /usr/lib64/libg2c.so.0 # /usr/lib/libg2c.so.0 #use /usr/lib64/ for ifarm
-#RTLIBS := -L${ROOTSYS}/lib -lCore  /usr/lib/libg2c.so.0 #use /usr/lib64/ for ifarm
+RTLIBS := -L${ROOTSYS}/lib -lCore 
+
 all: $(PROGRAM)
 
 $(PROGRAM): $(PROGRAM).o
