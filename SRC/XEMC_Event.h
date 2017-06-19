@@ -52,7 +52,7 @@ class XEMCEvent
                 /*void Init(){{{*/
                 void Init()
                 {
-                    xem_target = new XEM_TGT();
+                    //xem_target = new XEM_TGT();
                     Win_Before_Mag.clear();
                     Win_After_Mag.clear();
                 };

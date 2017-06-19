@@ -60,58 +60,59 @@ int main(int argc,char** argv){
 	Double_t Q2 = 4.0 * E0 * Ep * pow(sin(Theta*3.1415926/180./2.0),2);
 	xbj = Q2/2.0/0.938272/(E0-Ep);
 
-	Int_t A=1; 
-	Int_t Z=0;
+    Int_t A=1; 
+    Int_t Z=0;
     //Basic input file, mostly important for radiated cross sections
-        /*Set Target{{{*/
-        if(Target == "H2") {
-            A = 2; Z = 1;}
-        else if(Target == "H3") {
-            A = 3; Z = 1;}
-        else if(Target == "He3") {
-            A = 3; Z = 2;}
-        else if(Target == "He4") {
-            A = 4; Z = 2;}
-        else if(Target == "C12") { 
-            A = 12; Z = 6;}
-        else if(Target == "Al") { 
-            A = 27; Z = 13;}
-        else if(Target == "Ca40") {
-            A = 40; Z = 20;}
-        else if(Target == "Ca48") {
-            A = 48; Z = 20;}
-        else if(Target == "Dummy") { 
-            A = 27; Z = 13;}
-        else{
-            cerr<<"I don't understand the Target!"<<endl;}
-        /*}}}*/
+    /*Set Target{{{*/
+    if(Target == "H2") {
+        A = 2; Z = 1;}
+    else if(Target == "H3") {
+        A = 3; Z = 1;}
+    else if(Target == "He3") {
+        A = 3; Z = 2;}
+    else if(Target == "He4") {
+        A = 4; Z = 2;}
+    else if(Target == "C12") { 
+        A = 12; Z = 6;}
+    else if(Target == "Al") { 
+        A = 27; Z = 13;}
+    else if(Target == "Ca40") {
+        A = 40; Z = 20;}
+    else if(Target == "Ca48") {
+        A = 48; Z = 20;}
+    else if(Target == "Dummy") { 
+        A = 27; Z = 13;}
+    else{
+        cerr<<"I don't understand the Target!"<<endl;}
+    /*}}}*/
 
-	//Define a event to calculate radiated cross section
-        TString Target_Input = Form("./input/%s_Input.dat",Target.Data());	
-        TString Target_Table="./SRC/target.table";
+    //Define a event to calculate radiated cross section
+    TString Target_Input = Form("./input/%s_Input.dat",Target.Data());	
+    TString Target_Table="./SRC/target.table";
 
-	XEMC* Event = new XEMC(); 
-        Event->Init(Target_Input.Data(), Target_Table.Data());
+    XEMC* Event = new XEMC(); 
+    Event->Init(Target_Input.Data(), Target_Table.Data());
 
-	int err = Event->Process(E0,Ep,Theta,A,Z,0.0);	
-	if(err>=0){
-		cs_qe = Event->XS_QE();
-		cs_dis = Event->XS_DIS();
-		cs_rad = Event->XS_Rad();
-		cs_born = Event->XS_Born();
-	}else{
-         cerr<<"*** ERROR, Something wrong with the XS calculation!!!"<<endl;
-        
-        }
-	delete Event;
-	cerr <<"------------------------------------------------------------------------"<<endl;
-	cerr <<"------------------------------------------------------------------------"<<endl;
-	cerr << Form("For Ep=%f, Theta=%f, xbj=%f, Q2=%f", Ep, Theta, xbj, Q2)<<endl;
-	cerr <<"------------------------------------------------------------------------"<<endl;
-	cerr << Form("@@@ XS_QE = %e, XS_DIS = %e, XS_Born = %e, XS_Rad = %e", cs_qe, cs_dis, cs_born,cs_rad)<<endl;
-	cerr <<"------------------------------------------------------------------------"<<endl;
-	cerr <<"------------------------------------------------------------------------"<<endl;
-	return 0;
+    cout<<"--- Done!"<<endl;
+    int err = Event->Process(E0,Ep,Theta,A,Z,0.0);	
+    if(err>=0){
+        cs_qe = Event->XS_QE();
+        cs_dis = Event->XS_DIS();
+        cs_rad = Event->XS_Rad();
+        cs_born = Event->XS_Born();
+    }else{
+        cerr<<"*** ERROR, Something wrong with the XS calculation!!!"<<endl;
+
+    }
+    delete Event;
+    cerr <<"------------------------------------------------------------------------"<<endl;
+    cerr <<"------------------------------------------------------------------------"<<endl;
+    cerr << Form("For Ep=%f, Theta=%f, xbj=%f, Q2=%f", Ep, Theta, xbj, Q2)<<endl;
+    cerr <<"------------------------------------------------------------------------"<<endl;
+    cerr << Form("@@@ XS_QE = %e, XS_DIS = %e, XS_Born = %e, XS_Rad = %e", cs_qe, cs_dis, cs_born,cs_rad)<<endl;
+    cerr <<"------------------------------------------------------------------------"<<endl;
+    cerr <<"------------------------------------------------------------------------"<<endl;
+    return 0;
 }
 
 
