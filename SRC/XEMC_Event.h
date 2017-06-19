@@ -46,38 +46,36 @@ class XEMCEvent
 		}
 		/*}}}*/
 
-		XEMCEvent(XEMCEvent const&){};
-		//XEMCEvent& operator=(XEMCEvent const&){};
+                XEMCEvent(XEMCEvent const&){};
+                //XEMCEvent& operator=(XEMCEvent const&){};
 
-		/*void Init(){{{*/
-		void Init()
-		{
-            xem_target = new XEM_TGT();
-			Win_Before_Mag.clear();
-			Win_After_Mag.clear();
-		};
-		/*}}}*/
-        
-        /*int Set_XEMCTarget(const TString kTarget_Table){{{*/
-		void Set_XEMCTarget(const TString& kTarget_Table, int kA, int kZ)
-		{  
-           cout<<Form("--- Set Target Parameters for (A=%d,Z=%d) from %s", kA, kZ, kTarget_Table.Data())<<endl;
-           xem_target->LoadTargetTable(kTarget_Table.Data());
-           xem_target->GetValueAZ(kA,kZ);
-        }
-		/*}}}*/
-        
-		/*int Run(){{{*/
-		int Run()
-		{   
-			int Num_Event_Add=0;
-			SetTargetMaterials();//Define Target Materials, like Windowns and Chambers
-			Num_Event_Add=CalcXS();//Calculate Cross Sections
+                /*void Init(){{{*/
+                void Init()
+                {
+                    xem_target = new XEM_TGT();
+                    Win_Before_Mag.clear();
+                    Win_After_Mag.clear();
+                };
+                /*}}}*/
 
-			return Num_Event_Add;
-		}
-		/*}}}*/
-	
+                /*int Set_XEMCTargetPar(const TString kTarget_Table){{{*/
+                void Set_XEMCTargetPar(const TString& kTarget_Table, int kA, int kZ)
+                {  
+                    xem_target->GetTargetPar(kTarget_Table.Data(), kA, kZ);
+                }
+                /*}}}*/
+
+                /*int Run(){{{*/
+                int Run()
+                {   
+                    int Num_Event_Add=0;
+                    SetTargetMaterials();//Define Target Materials, like Windowns and Chambers
+                    Num_Event_Add=CalcXS();//Calculate Cross Sections
+
+                    return Num_Event_Add;
+                }
+                /*}}}*/
+
 		/*void AddOneMaterial(vector<Material>& aWin,const double& aX0,const double& arho,const double& aL,const double& aA,const int& aZ,string aName){{{*/
 		void AddOneMaterial(vector<Material>& aWin,const double& aX0,const double& arho,const double& aL,const double& aA,const int& aZ,string aName)
 		{

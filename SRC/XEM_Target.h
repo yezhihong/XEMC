@@ -24,11 +24,14 @@ class XEM_TGT
    Double_t Resol; //Parameter for DEEPSIG smearing
    Double_t ESep;  //Separation Energy
    Double_t f0,B,a,b,alpha; //parameters to calculate F(y)
+
+ private:
+   Bool_t fExist;
+   TString fTarget_Table;
+
   
   public:
   XEM_TGT() {
- //   GetValue();
- //   GetValueAZ();
   };
 		
   /*~XEM_TGT{{{*/
@@ -37,43 +40,13 @@ class XEM_TGT
   }
   /*}}}*/
 
- /* XEM_TGT(XEM_TGT const&){};*/
-  //XEM_TGT& operator=(XEM_TGT const&){return *this;};
-  //XEM_TGT& operator*=(const Double_t& aNum){
-    ////     this->Name *= aNum;
-    //this->Mass *= aNum;
-    //this->A *= (int) aNum;
-    //this->Z *= (int) aNum;
-      
-    //[> this->epsn *= aNum; <]
-    //[> this->fermi *=aNum; <]
-    //[> this->aa *=aNum; <]
-    //[> this->bb *=aNum; <]
-    //[> this->cc *=aNum; <]
-    //[> this->dd *=aNum; <]
-    //[> this->ee *=aNum; <]
-    //[> this->ff *=aNum; <]
-      
-    //this->RL *=aNum;
-    //this->Resol *=aNum;
-    //this->ESep *=aNum;
-    //this->f0 *=aNum;
-    //this->B *=aNum;
-    //this->a *=aNum;
-    //this->b *=aNum;
-    //this->alpha *=aNum;
-      
-    //return *this;
-  /*};*/
- 
-  void LoadTargetTable(const TString& kTarget_Table ){
-      //fTARGET_TABLE=kTarget_Table;
+  void GetTargetPar(const TString kTarget_Table,  const int kA, const int kZ ){
       cout<<"&&&& XEM_TGT: Loading Table from "<<kTarget_Table.Data()<<endl;
-      ifstream table; table.open(kTarget_Table.Data());
+      ifstream table; 
+      table.open(kTarget_Table.Data());
       //FIX_HERE: temperate method to read target info. will improve it later.
       TString content; Int_t CommentLine=0;
       while( content.ReadLine(table)){
-          cout<<content.Data()<<endl;
           if ( content.BeginsWith("#") )
               CommentLine++;
           else
@@ -83,81 +56,37 @@ class XEM_TGT
 
       Int_t aLine=0;
       table.open(kTarget_Table.Data());
-      int i=0;
+      TString name1;
+      Int_t A1, Z1;
+      Double_t mass1, RL1, Resol1, ESep1, f01, B1, a1, b1, alpha1;
       while(!(table.eof())){
           aLine++;
           if(aLine<=CommentLine)
               content.ReadLine(table);
           else{
-              table >> fName[i] >> fA[i] >> fZ[i] >> fMass[i] >> fRL[i] >> fResol[i] >> fESep[i] 
-                  >> fF0[i] >> fBigB[i] >> fSmallA[i] >> fSmallB[i] >> fAlpha[i];
-              cout<<Form("-- Target: Name= %s, A=%d, Z=%d", fName[i].Data(), fA[i], fZ[i])<<endl;
-              i++;
+             table >> name1 >> A1 >> Z1 >> mass1 >> RL1 >> Resol1 >>ESep1 >> f01>> B1>>a1>>b1>>alpha1;
+             cout<<Form("--- Name = %s, A = %d, Z = %d", name1.Data(), A1, Z1)<<endl;
+
+             if((A1==kA)&&(Z1==kZ)){
+                 Name = name1;
+                 A = A1;
+                 Z = Z1;
+                 Mass = mass1;
+                 RL = RL1;
+                 Resol = Resol1;
+                 ESep = ESep1;
+                 f0 = f01;
+                 B = B1;
+                 a = a1;
+                 b = b1;
+                 alpha = alpha1;
+
+                 fExist = kTRUE;
+                 break;
+             }
           }
       }
-      N_Target = i-1;
       table.close();
-  };
-
-  void GetValue( const TString& kName ){
-      fExist = kFALSE;
-      for (int i=0;i<N_Target;i++){
-          if(kName==fName[i]){
-
-              A = fA[i];
-              Z = fZ[i];
-              Mass = fMass[i];
-              RL = fRL[i];
-              Resol = fResol[i];
-              ESep = fESep[i];
-              f0 = fF0[i];
-              B = fBigB[i];
-              a = fSmallA[i];
-              b = fSmallB[i];
-              alpha = fAlpha[i];
-
-              fExist = kTRUE;
-              break;
-          }
-      }
-
-      if(fExist)
-          cerr <<endl<< "@@@@@@ I have found your target from the table!" <<endl;
-      else{
-          cerr << "****** ERROR, your target is not in the table! Check the following table:" <<endl;
-          List();
-      }
-      //Be careful -- the following variables needed to be converted:
-      Mass *= U2GeV ; //From u to GeV;
-      ESep/=1000.0; 
-      f0  /=1000.0;
-      B/=1000.0;
-      a /=1000.0;
-      b /=1000.0;
-  }; 
-
-  void GetValueAZ( const int kA, const int kZ ){
-      fExist = kFALSE;
-      for (int i=0;i<N_Target;i++){
-          if((fA[i]==kA)&&(fZ[i]==kZ)){
-
-              A = fA[i];
-              Z = fZ[i];
-              Mass = fMass[i];
-              RL = fRL[i];
-              Resol = fResol[i];
-              ESep = fESep[i];
-              f0 = fF0[i];
-              B = fBigB[i];
-              a = fSmallA[i];
-              b = fSmallB[i];
-              alpha = fAlpha[i];
-
-              fExist = kTRUE;
-              break;
-          }
-      }
-
 
       if(!(fExist)){
           //     cerr <<endl<< "@@@@@@ I have found your target from the table!" <<endl;
@@ -172,10 +101,12 @@ class XEM_TGT
       B/=1000.0;
       a /=1000.0;
       b /=1000.0;
-    }; 
-    
+
+      fTarget_Table=kTarget_Table;
+  }
+
   void SetValue(
-                const TString& kName=" ",
+                const TString kName=" ",
                 const Double_t& kMass=0,
                 const Int_t& kA=0,
                 const Int_t& kZ=0,
@@ -200,10 +131,10 @@ class XEM_TGT
     a=ka;
     b=kb;
     alpha=kalpha;
-  }; 
+  } 
   
   void List(){
-    ifstream table(fTARGET_TABLE.Data());
+    ifstream table(fTarget_Table.Data());
     TString content; 
     cerr <<endl<< "~~~~~~~~~~~~~~~~~ Target Table ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
     cerr <<"Name     A     Z      Mass       R.L.     RESOL     ESEP       f0         B           a          b        alpha"<<endl;
@@ -233,50 +164,8 @@ class XEM_TGT
     Printf("%-*s%f",20,"|   alpha:  ",alpha);
     cerr << "--------------------------------------"<<endl<<endl;
 
-  };
+  }
      
- private:
-   Bool_t fExist;
-
-   TString fName[20];
-   Int_t fA[20];
-   Int_t fZ[20];
-   Double_t fMass[20];
-   Double_t fRL[20];
-   Double_t fResol[20];
-   Double_t fESep[20];
-   Double_t fF0[20];
-   Double_t fBigB[20];
-   Double_t fSmallA[20];
-   Double_t fSmallB[20];
-   Double_t fAlpha[20];
-
-   Int_t N_Target;
-
-   TString fTARGET_TABLE;
-
  };
-
-
-
-//   //Define in DBisNew4He3.f, but I don't know why the epsn values are different with the target table
-//   Double_t fermip[200]={200*0.};
-//   Double_t epsn[200]={200*0.};
-//   
-//   fermip[197]=.264;
-//   fermip[64]=.260;
-//   fermip[27]=.240;
-//   fermip[12]=.221;
-//   fermip[4]=.160;
-//   fermip[3]=.160;
-//   fermip[2]=.160;
-// 
-//   epsn[197]=.006;
-//   epsn[64]=0.01;
-//   epsn[27]=.0083;
-//   epsn[12]=.016;
-//   epsn[4]=.02;
-//   epsn[3]=.0055;
-//   epsn[2]=.0022;
 
 #endif

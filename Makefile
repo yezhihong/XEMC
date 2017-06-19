@@ -8,7 +8,8 @@ CFLAGS = $(shell $(ROOTSYS)/bin/root-config --cflags)
 LIBS   = $(shell $(ROOTSYS)/bin/root-config --libs)
 GLIBS  = $(shell $(ROOTSYS)/bin/root-config --glibs)
 
-XEMCDIR=/work/halla/e08014/disk1/yez/XEMC
+#XEMCDIR=/work/halla/e08014/disk1/yez/XEMC
+XEMCDIR=./
 
 CFLAGS += -Wall -g
 INCLUDE := -I${ROOTSYS}/include -I$(XEMCDIR)/SRC
@@ -17,12 +18,12 @@ RTLIBS := -L${ROOTSYS}/lib -lCore
 all: $(PROGRAM)
 
 $(PROGRAM): $(PROGRAM).o
-	g++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) 
-	#clang++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) 
+	#g++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) 
+	clang++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) 
 
 $(PROGRAM).o: $(PROGRAM).C
-	g++ $(CFLAGS) -c -o $(PROGRAM).o $(PROGRAM).C ${INCLUDE}
-	#clang++ $(CFLAGS) -c -o $(PROGRAM).o $(PROGRAM).C ${INCLUDE}
+	#g++ $(CFLAGS) -c -o $(PROGRAM).o $(PROGRAM).C ${INCLUDE}
+	clang++ $(CFLAGS) -c -o $(PROGRAM).o $(PROGRAM).C ${INCLUDE}
 
 clean:
 	rm -f *.o ./SRC/*.o	

@@ -63,35 +63,35 @@ int main(int argc,char** argv){
 	Int_t A=1; 
 	Int_t Z=0;
     //Basic input file, mostly important for radiated cross sections
-	TString Target_Input = Form("./input/%s_Input.dat",Target.Data());	
-
-	/*Set Target{{{*/
-	if(Target == "H2") {
-		A = 2; Z = 1;}
-	else if(Target == "H3") {
-		A = 3; Z = 1;}
-    else if(Target == "He3") {
-        A = 3; Z = 2;}
-	else if(Target == "He4") {
-		A = 4; Z = 2;}
-	else if(Target == "C12") { 
-		A = 12; Z = 6;}
-	else if(Target == "Al") { 
-		A = 27; Z = 13;}
-	else if(Target == "Ca40") {
-		A = 40; Z = 20;}
-	else if(Target == "Ca48") {
-		A = 48; Z = 20;}
-	else if(Target == "Dummy") { 
-		A = 27; Z = 13;}
-	else{
-		cerr<<"I don't understand the Target!"<<endl;}
-	/*}}}*/
+        /*Set Target{{{*/
+        if(Target == "H2") {
+            A = 2; Z = 1;}
+        else if(Target == "H3") {
+            A = 3; Z = 1;}
+        else if(Target == "He3") {
+            A = 3; Z = 2;}
+        else if(Target == "He4") {
+            A = 4; Z = 2;}
+        else if(Target == "C12") { 
+            A = 12; Z = 6;}
+        else if(Target == "Al") { 
+            A = 27; Z = 13;}
+        else if(Target == "Ca40") {
+            A = 40; Z = 20;}
+        else if(Target == "Ca48") {
+            A = 48; Z = 20;}
+        else if(Target == "Dummy") { 
+            A = 27; Z = 13;}
+        else{
+            cerr<<"I don't understand the Target!"<<endl;}
+        /*}}}*/
 
 	//Define a event to calculate radiated cross section
+        TString Target_Input = Form("./input/%s_Input.dat",Target.Data());	
+        TString Target_Table="./SRC/target.table";
+
 	XEMC* Event = new XEMC(); 
-    TString Target_Table="/work/halla/e08014/disk1/yez/XEMC/SRC/target.table";
-	Event->Init(Target_Input.Data(), Target_Table.Data());
+        Event->Init(Target_Input.Data(), Target_Table.Data());
 
 	int err = Event->Process(E0,Ep,Theta,A,Z,0.0);	
 	if(err>=0){
