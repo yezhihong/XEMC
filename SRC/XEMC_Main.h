@@ -64,7 +64,7 @@
 
 using namespace std;
 
-TString TARGET_TABLE = "/work/halla/e08014/disk1/yez/XEMC/SRC/target.table";
+const TString TARGET_TABLE_DEFAULT = "/work/halla/e08014/disk1/yez/XEMC/SRC/target.table";
 #include "XEM_Target.h"
   
 class XEM_VAR2/*{{{*/

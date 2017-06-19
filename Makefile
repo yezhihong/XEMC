@@ -8,7 +8,7 @@ CFLAGS = $(shell $(ROOTSYS)/bin/root-config --cflags)
 LIBS   = $(shell $(ROOTSYS)/bin/root-config --libs)
 GLIBS  = $(shell $(ROOTSYS)/bin/root-config --glibs)
 
-XEMCDIR=/work/halla/triton/yez/XEMC
+XEMCDIR=/work/halla/e08014/disk1/yez/XEMC
 
 CFLAGS += -Wall -g
 INCLUDE := -I${ROOTSYS}/include -I$(XEMCDIR)/SRC

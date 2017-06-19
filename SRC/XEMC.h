@@ -298,7 +298,7 @@ class XEMC
         /*}}}*/
 
 		/*Init(){{{*/
-		void Init (const string kTarget_Input){
+		void Init (const string kTarget_Input, const string kTarget_Table){
 
 			cerr <<"---> Initializing Target Parameters from "<<kTarget_Input<<" ..."<<endl;
 			int i,j,k;
@@ -431,6 +431,8 @@ class XEMC
 			Event->DeltaE = DeltaE;
 			Event->XEMCFLAG = XEMCFLAG;
 			//Target
+            Event->Set_XEMCTarget(kTarget_Table.c_str(), Target_A, Target_Z);
+            //
 			Event->Target.Name= Target_Name;
 			Event->Target.A= Target_A;
 			Event->Target.Z= Target_Z;
@@ -460,11 +462,6 @@ class XEMC
 		}
 		/*}}}*/
 		/*}}}*/
-
-        void SetTargetTable(TString kTargetTable){/*{{{*/
-             TARGET_TABLE = kTargetTable;       
-             cout<<"---> Set the Target Table for Fy Func: "<<kTargetTable.Data()<<endl;
-        }/*}}}*/
 
 		/*Clear some variables if needed to re-initialize{{{*/
         void Clear(){

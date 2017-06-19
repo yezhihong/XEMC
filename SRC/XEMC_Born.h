@@ -19,7 +19,7 @@ bool IsGoodFlag(int kflag){
 //XEM_VAR3* XEMC_Born(double iE0set, double iEpset, double iTheta, XEM_TGT* iTarget)
 //Change to Double_t type to be called from outside
 //                         MeV             MeV           Deg
-Double_t XEMC_Born(double iE0set, double iEpset, double iTheta, int iA,int iZ,int iFlag)
+Double_t XEMC_Born(double iE0set, double iEpset, double iTheta, XEM_TGT* iXEM_Target,int iFlag)
 {
   //The unit of XS is nb/(sr*MeV/c);
 
@@ -31,8 +31,8 @@ Double_t XEMC_Born(double iE0set, double iEpset, double iTheta, int iA,int iZ,in
   Double_t E0 = iE0set*MeVToGeV; //MeV from SAMC
   Double_t Ep = iEpset*MeVToGeV; //MeV from SAMC
   Double_t Theta = iTheta*TMath::DegToRad();
-  XEM_TGT* iTarget=new XEM_TGT();
-  iTarget->GetValueAZ(iA,iZ);
+  //XEM_TGT* iTarget=new XEM_TGT();
+  //iTarget->GetValueAZ(iA,iZ);
 
 //  if(IsDebug)
 //      iTarget->Print();
@@ -41,14 +41,14 @@ Double_t XEMC_Born(double iE0set, double iEpset, double iTheta, int iA,int iZ,in
   XEM_XS* XS_Born = new XEM_XS();  
 
   if(IsGoodFlag(iFlag)) 
-     gCal_Sigma(E0,Ep,Theta,iTarget,bCCor,iFlag,XS_Born);
+     gCal_Sigma(E0,Ep,Theta,iXEM_Target,bCCor,iFlag,XS_Born);
   else{
      cerr<< "******* Warning, Wrong XEMC Flag!!!"<<endl;
   }
     
   xs = XS_Born->All;
 
-  delete iTarget;
+  //delete iTarget;
   delete XS_Born;
   return xs;
 }
