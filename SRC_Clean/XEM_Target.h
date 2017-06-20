@@ -3,9 +3,9 @@
 #define U2GeV  0.931494028       //Convert from atomic mass unit to GeV unit   
 ////////////////////////////////////////
 //IMPORTANT: Define Target info
-////////////////////////////////////////
+//const TString TARGET_TABLE = "/Users/yez/work/github/XEMC/SRC/target.table";
 //Target Table: include two types of tables: Radiative Corrected and Non-Radiative Corrected  
-const TString TARGET_TABLE = "/Users/yez/work/github/XEMC/SRC/target.table";
+////////////////////////////////////////
 
 class XEM_TGT
 {
@@ -147,6 +147,9 @@ class XEM_TGT
     B/=1000.0;
     a /=1000.0;
     b /=1000.0;
+
+/*    cout<<Form("---Fy Parameters for A=%d, Z=%d: ", kA, kZ)<<endl;*/
+    /*cout<<Form("---                  f0=%f, B=%f, a=%f, b=%f, alpha=%f: ", f0, B, a, b, alpha)<<endl;*/
   }; 
     
   void SetValue(
