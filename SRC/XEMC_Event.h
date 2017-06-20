@@ -41,8 +41,8 @@ class XEMCEvent
 		virtual ~XEMCEvent()
 		{
 			Win_Before_Mag.clear();
-			Win_After_Mag.clear();
-            delete xem_target;
+                        Win_After_Mag.clear();
+                        delete xem_target;
 		}
 		/*}}}*/
 

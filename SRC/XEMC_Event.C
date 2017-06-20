@@ -9,8 +9,6 @@
 //  generation and info related to HRS forward and back   //
 //  -ward reconstruction, etc.                            //
 ////////////////////////////////////////////////////////////
-#include "XEMC_Const.h"
-#include "XEMC_Born.h"
 
 #define MSIZE 5
 /*struct Material{{{*/
@@ -43,31 +41,40 @@ class XEMCEvent
 		virtual ~XEMCEvent()
 		{
 			Win_Before_Mag.clear();
-			Win_After_Mag.clear();
+                        Win_After_Mag.clear();
+                        delete xem_target;
 		}
 		/*}}}*/
 
-		XEMCEvent(XEMCEvent const&){};
-		XEMCEvent& operator=(XEMCEvent const&){};
+                XEMCEvent(XEMCEvent const&){};
+                //XEMCEvent& operator=(XEMCEvent const&){};
 
-		/*void Init(){{{*/
-		void Init()
-		{
-			Win_Before_Mag.clear();
-			Win_After_Mag.clear();
-		};
-		/*}}}*/
+                /*void Init(){{{*/
+                void Init()
+                {
+                    xem_target = new XEM_TGT();
+                    Win_Before_Mag.clear();
+                    Win_After_Mag.clear();
+                };
+                /*}}}*/
 
-		/*int Run(){{{*/
-		int Run()
-		{   
-			int Num_Event_Add=0;
-			SetTarget();//Define Target Materials, like Windowns and Chambers
-			Num_Event_Add=CalcXS();//Calculate Cross Sections
+                /*int Set_XEMCTargetPar(const TString kTarget_Table){{{*/
+                void Set_XEMCTargetPar(const TString& kTarget_Table, int kA, int kZ)
+                {  
+                    xem_target->GetTargetPar(kTarget_Table.Data(), kA, kZ);
+                }
+                /*}}}*/
 
-			return 0;
-		}
-		/*}}}*/
+                /*int Run(){{{*/
+                int Run()
+                {   
+                    int Num_Event_Add=0;
+                    SetTargetMaterials();//Define Target Materials, like Windowns and Chambers
+                    Num_Event_Add=CalcXS();//Calculate Cross Sections
+
+                    return Num_Event_Add;
+                }
+                /*}}}*/
 
 		/*void AddOneMaterial(vector<Material>& aWin,const double& aX0,const double& arho,const double& aL,const double& aA,const int& aZ,string aName){{{*/
 		void AddOneMaterial(vector<Material>& aWin,const double& aX0,const double& arho,const double& aL,const double& aA,const int& aZ,string aName)
@@ -96,8 +103,8 @@ class XEMCEvent
 		/*}}}*/
 
 	private:
-		/*void SetTarget(){{{*/
-		void SetTarget()
+		/*void SetTargetMaterials(){{{*/
+		void SetTargetMaterials()
 		{
 			//set value for Member Data derived from variables from file
 			//File provides E_s,theta,Target.(Z,A,T,rho) Win_i.(Z,A,T,rho)
@@ -115,11 +122,11 @@ class XEMCEvent
 			/*Set Beam Info(HCS and TCS){{{*/
 			//know beam_x,beam_y,reactz_gen,E_s,theta,HRS_L
 			//Set s,s_TCS,x_tg_gen,y_tg_gen,p_TCS,p_P,p_P_TCS
-			theta_rad=theta*DegToRad();//rad
+			theta_rad=theta*TMath::DegToRad();//rad
 			s(0)=beam_x; //beam offset, cm
 			s(1)=beam_y; //beam offset, cm
-			reactz_gen+=-(beam_x)*tan(T_theta*DegToRad());
-     		s(2)=reactz_gen;  //--Z. Ye, 09/11/2012
+			reactz_gen+=-(beam_x)*tan(T_theta*TMath::DegToRad());
+			s(2)=reactz_gen;  //--Z. Ye, 09/11/2012
 			//s(2)=0.0;    //Assume reaction always happens at the center of the target, replace reactz_gen; //cm
 			target_edgepoint_TRCS(0)=theta/fabs(theta)*T_H/2;//if theta>0,T_H/2, if<0, -T_H/2 in Target Rotation Coordinate System(T_theta=0) not TCS, check Coordinate.svg
 			target_edgepoint_TRCS(1)=0;
@@ -129,7 +136,7 @@ class XEMCEvent
 			lp_TRCS=s;
 			lp_TRCS(2)-=z0;
 			//Printf("s(%g,%g,%g),target_edgepoint_TRCS(%g,%g,%g),lp_TRCS(%g,%g,%g)",s(0),s(1),s(2),target_edgepoint_TRCS(0),target_edgepoint_TRCS(1),target_edgepoint_TRCS(2),lp_TRCS(0),lp_TRCS(1),lp_TRCS(2));
-			lp_TRCS.RotateY(-T_theta*DegToRad());
+			lp_TRCS.RotateY(-T_theta*TMath::DegToRad());
 
 			s_TCS=s;
 			s_TCS.RotateZ(PI/2);//passive ratation around HCS, so -(-PI/2)
@@ -164,7 +171,7 @@ class XEMCEvent
 
 			Angle=theta_rad;
 			Angle_Deg = theta;
-			//     Angle_Deg=Angle*RadToDeg();
+			//     Angle_Deg=Angle*TMath::RadToDeg();
 			sinsq_Angle=sin(Angle/2)*sin(Angle/2);
 			sinsq=sin(Angle/2)*sin(Angle/2);//sin(Angle/2)^2
 			//p_P_TCS=lz;//Now think it's in TCS
@@ -213,10 +220,11 @@ class XEMCEvent
 			unsigned int FirstInWinBeforeMagBlock=0;
 			imax=Win_Before_Mag.size();
 
-			for ( i=0; i<imax; i++ )
+			for ( i=0; i<imax; i++ ){
 				lHL+=Win_Before_Mag[i].L;
-
-			double lphrad=theta_rad-T_theta*DegToRad();//scattering angle in y axis in TCS or x axis in TRCS
+				//cerr<< Form("Win#%d, L=%f",i,Win_Before_Mag[i].L)<<endl;
+			}
+			double lphrad=theta_rad-T_theta*TMath::DegToRad();//scattering angle in y axis in TCS or x axis in TRCS
 			//it doesn't I add atan(ph_tg_gen) since it's so small for target and windows
 
 			//Win_Before_Mag add Win_f
@@ -228,9 +236,6 @@ class XEMCEvent
 				FirstInWinBeforeMagBlock++;
 			}
 
-			//Win_Before_Mag add Target
-			it=Win_Before_Mag.begin();
-
 			//Add special treatment for E08014 long targets, which have temperature distribution along targets
 			//Upstream part from -10cm to -2cm are denser and Downstream from -2cm to +10cm.
 			//Basically we treat this system like two targets, each of which has different target lenght and 
@@ -238,12 +243,12 @@ class XEMCEvent
 			//are need to be updated for each part.	--Z. Ye, 09/11/2012
 			/*if(IsBump){{{*/
 			if(IsBump){
-			    //cerr<<"--- Doing special treatment for long targets! "<<endl;
+				//cerr<<"--- Doing special treatment for long targets! "<<endl;
 				//FIX_HERE, now we calculate the actual length from the reaction point 
 				double lL; //assume target is rentangle lL=distance between reactz_gen and edge of target
 				//in TRCS x plane<--> y plane in TCS
-				double Target_Boundary = -2.0 - z0; //Currently I take the boundary of two parts at -2cm //FIX_HERE, a potential bug since I am not sure the sign of z0, ZYE 09/19/2012
-				double rho_Up = 1.25;
+				double Target_Boundary = -2.0 - z0; //Currently I take the boundary of two parts at -2cm //FIX_HERE, a potential bug since I am not sure the sign of z0, Z.YE9/19/2012
+				double rho_Up = 1.225;
 				double rho_Down = 0.85;
 				lL=target_edgepoint_TRCS(2)-lp_TRCS(2);//verticle distance between interaction point and edge plane of target
 				if ( lL>T_L ) {
@@ -251,12 +256,14 @@ class XEMCEvent
 				}
 				/*If the reaction point locates at the upstream part,which is densier, we need to treat the target as two independent parts{{{*/
 				if(lL>(target_edgepoint_TRCS(2)-Target_Boundary)){
-
 					lL*=tan(lphrad);
 					lL+=lp_TRCS(0);//x on edge
 
 					/*in the target and come out from the downstream edge of the target{{{*/
 					if ( fabs(lL)<fabs(target_edgepoint_TRCS(0)) ) {//HCS 0=x top view
+						//Win_Before_Mag add Target
+						it=Win_Before_Mag.begin();
+
 						//Add Upstream Part
 						m0=Target;	
 						m0.L=T_L - (target_edgepoint_TRCS(2)-Target_Boundary);    //FIX_HERE, from -10cm to -2cm, target is denser but final number need to conform
@@ -266,6 +273,7 @@ class XEMCEvent
 						lL=fabs((lp_TRCS(2)-Target_Boundary)/cos(lphrad));//The length from the boundary to the reaction points in the dense area.
 						m0.L=lL;
 						Win_Before_Mag.insert(it,m0);
+						FirstInWinBeforeMagBlock++;
 
 						Target_Up_TR = fabs(lp_TRCS(2)+T_L/2.0+z0)*m0.rho/m0.X0;
 						Target_Up_bt =b(m0.Z)*Target_Up_TR;
@@ -281,7 +289,8 @@ class XEMCEvent
 						lL=fabs((target_edgepoint_TRCS(2)-Target_Boundary)/cos(lphrad));//The length from the boundary to the reaction points in the dense area.
 						m0.L=lL;
 						Win_Before_Mag.insert(it,m0);
-                       
+						FirstInWinBeforeMagBlock++;
+
 						Target_Down_TR += m0.L*m0.rho/m0.X0;
 						Target_Down_bt += b(m0.Z)*Target_Down_TR;
 					}/*}}}*/
@@ -300,7 +309,8 @@ class XEMCEvent
 							lL=fabs((target_edgepoint_TRCS(0)-lp_TRCS(0))/sin(lphrad));
 							m0.L=lL;	
 							Win_Before_Mag.insert(it,m0);
-                
+							FirstInWinBeforeMagBlock++;
+
 							Target_Up_TR = fabs(lp_TRCS(2)+T_L/2.0+z0)*m0.rho/m0.X0;
 							Target_Up_bt =b(m0.Z)*Target_Up_TR;
 							Target_Down_TR = m0.L*m0.rho/m0.X0;
@@ -310,12 +320,13 @@ class XEMCEvent
 						else{	
 							m0.L=lL;	
 							Win_Before_Mag.insert(it,m0);
-	
+							FirstInWinBeforeMagBlock++;
+
 							Target_Up_TR = fabs(lp_TRCS(2)+T_L/2.0+z0)*m0.rho/m0.X0;
 							Target_Up_bt =b(m0.Z)*Target_Up_TR;
 							Target_Down_TR = m0.L*m0.rho/m0.X0;
 							Target_Down_bt = b(m0.Z)*Target_Down_TR;
-	
+
 							it++;
 							//Add Downstream Part
 							m0=Target;
@@ -327,6 +338,7 @@ class XEMCEvent
 							if(lL>=0.0){//If the particle travel through downstream part before It get out, add this part, otherwise only consider the upstream part
 								m0.L=lL;
 								Win_Before_Mag.insert(it,m0);					
+								FirstInWinBeforeMagBlock++;
 								Target_Down_TR += m0.L*m0.rho/m0.X0;
 								Target_Down_bt += b(m0.Z)*Target_Down_TR;
 							}
@@ -335,12 +347,12 @@ class XEMCEvent
 				}/*}}}*/
 				/*If the reaction happens at the downstream part, we only need to consider this part only, unless we have angle larger than 90deg, which we don't have{{{*/	
 				else{
-                    //Add Upstream part
+					//Add Upstream part
 					m0=Target;
-	                m0.rho*=rho_Up;
+					m0.rho*=rho_Up;
 					Target_Up_TR = fabs(Target_Boundary+T_L/2.0+z0)*m0.rho/m0.X0;
 					Target_Up_bt =b(m0.Z)*Target_Up_TR;
-	
+
 					//Add Downstream Part
 					m0=Target;
 					m0.L=target_edgepoint_TRCS(2)-Target_Boundary;   //FIX_HERE, need to conform
@@ -366,22 +378,24 @@ class XEMCEvent
 					}
 					m0.L=lL;
 					Win_Before_Mag.insert(it,m0);
-					
+					FirstInWinBeforeMagBlock++;
 					Target_Up_TR += fabs(lp_TRCS(2)-Target_Boundary)*m0.rho/m0.X0;
 					Target_Up_bt += b(m0.Z)*Target_Up_TR;
 					Target_Down_TR = m0.L*m0.rho/m0.X0;
 					Target_Down_bt = b(m0.Z)*Target_Down_TR;
-	
-
 				}/*End of downstream part only}}}*/
-			}/*End of special long target treatment}}}*/
 
-			/*If we don't need to treat targets into two parts, like foil targets{{{*/
-			else{
+			//	cerr<<Form("L=%f, TR_Up=%f, bt_Up=%f, TR_Down=%f, bt_Down=%f", lL,Target_Up_TR, Target_Up_bt, Target_Down_TR, Target_Down_bt)<<endl;
+			}/*End of special long target treatment}}}*/
+			//No Special Treatment
+			else{	
+				//Win_Before_Mag add Target
+				it=Win_Before_Mag.begin();
 				m0=Target;//target after interaction point added to Win_Before_Mag
 				double lL; //assume target is rentangle lL=distance between reactz_gen and edge of target
 				//in TRCS x plane<--> y plane in TCS
 				lL=target_edgepoint_TRCS(2)-lp_TRCS(2);//verticle distance between interaction point and edge plane of target
+
 				if ( lL>T_L ) {
 					Printf("target_edgepoint_TRCS(%g,%g,%g),lp_TRCS(%g,%g,%g)",target_edgepoint_TRCS(0),target_edgepoint_TRCS(1),target_edgepoint_TRCS(2),lp_TRCS(0),lp_TRCS(1),lp_TRCS(2));
 				}
@@ -396,10 +410,11 @@ class XEMCEvent
 					//out of target before hiting the edge of target, the edge means the downstream face.
 					lL=fabs((target_edgepoint_TRCS(0)-lp_TRCS(0))/sin(lphrad));
 				}
+
 				m0.L=lL;
 				Win_Before_Mag.insert(it,m0);
 				FirstInWinBeforeMagBlock++;
-			}/*END of normal treatment for foil targets}}}*/
+			};
 
 			//Win_Before_Mag add Air before last material in the input file
 			imax=Win_Before_Mag.size();
@@ -495,31 +510,34 @@ class XEMCEvent
 
 			cs_M=sigma_M(E_s,Angle_Deg);
 
+			/*{{{Born Crosss Section Model*/
 			//NOTE: I replace the born cross section model with my own XEMC model 
 			//   -- Zhihong Ye 01/25/2012
 			//The unit of XS is nb/(sr*MeV/c);
-			if(!IsQFS){
-				cs_Born = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),1);//always calcuate QE+DIS for Born
-				cs_Final = cs_Born;
+			if (IsQFS){
+				cs_qfs=sigma_qfs(Target.Z,Target.A,E_s,E_s-E_p,Angle_Deg,Fermi_Moment,NIE,IsQFS_Q2dep);//Q.E. Peak
+				cs_del=sigma_del(Target.Z,Target.A,E_s,E_s-E_p,Angle_Deg,Fermi_Moment,DEL_SEP);//Delta
+				cs_x=sigma_x(Target.A,E_s,E_s-E_p,Angle_Deg);//DIS
+				cs_r1500=sigma_resonance(1500.,Target.A,Target.Z,E_s,E_s-E_p,Angle_Deg,Fermi_Moment);//Resonace 1500 MeV
+				cs_r1700=sigma_resonance(1700.,Target.A,Target.Z,E_s,E_s-E_p,Angle_Deg,Fermi_Moment);//Resonace 1700 MeV
+				cs_2N=sigma_2N(Target.Z,Target.A,E_s,E_s-E_p,Angle_Deg,Fermi_Moment);//Dip region
+				cs_Born=cs_qfs+cs_del+cs_x+cs_r1500+cs_r1700+cs_2N;
 			}
+			else{ //ZYE
+				//Born Cross Section Model from XEM, Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only 4->DIS_F1F2IN06_XEM Only
+				//cs_qe = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),2); 
+				//cs_dis = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),3); 
+                cs_qe = XEMC_Born(E_s,E_p,Angle_Deg,xem_target,2); 
+                cs_dis = XEMC_Born(E_s,E_p,Angle_Deg,xem_target,3); 
+				cs_Born = cs_qe + cs_dis; 
+			}
+			cs_Final = cs_Born;
+			/*}}}*/
 
-			if ( IsRadCor )
+			if ( IsRadCor && cs_Born >= 1e-13 )
 			{
 				//all nbarn/sr
-				/*{{{Born Crosss Section Model*/
-				if (IsQFS){
-					cs_qfs=sigma_qfs(Target.Z,Target.A,E_s,E_s-E_p,Angle_Deg,Fermi_Moment,NIE,IsQFS_Q2dep);//Q.E. Peak
-					cs_del=sigma_del(Target.Z,Target.A,E_s,E_s-E_p,Angle_Deg,Fermi_Moment,DEL_SEP);//Delta
-					cs_x=sigma_x(Target.A,E_s,E_s-E_p,Angle_Deg);//DIS
-					cs_r1500=sigma_resonance(1500.,Target.A,Target.Z,E_s,E_s-E_p,Angle_Deg,Fermi_Moment);//Resonace 1500 MeV
-					cs_r1700=sigma_resonance(1700.,Target.A,Target.Z,E_s,E_s-E_p,Angle_Deg,Fermi_Moment);//Resonace 1700 MeV
-					cs_2N=sigma_2N(Target.Z,Target.A,E_s,E_s-E_p,Angle_Deg,Fermi_Moment);//Dip region
-					cs_q=cs_qfs+cs_del+cs_x+cs_r1500+cs_r1700+cs_2N;
-					cs_Born = cs_q;
-				}
-				else
-					cs_q = cs_Final; //Use XEMC Born Cross Section model, --Zhihong Ye, 06/19/2012
-				/*}}}*/
+				cs_q = cs_Final;
 
 				/*Set Info for RadCor{{{*/
 				tail_s.SetXYZT(0,0,sqrt(E_s*E_s-M2),E_s);//assume along z
@@ -534,9 +552,6 @@ class XEMCEvent
 				w_p=E_s/(1+2*E_s*sinsq_Angle/Target.M)-E_p; //A51
 				v_s=w_s/E_s; //A53
 				v_p=w_p/(E_p+w_p);
-
-				//FIX_HERE, Is is a good assumption? --Z. Ye, 09/11/2012
-                //Anyhow, I add a special treatment for long target since I have the info
 				if(IsBump){
 					tb=Win_i.TR+Target_Up_TR;
 					ta=Win_f.TR+Target_Down_TR;
@@ -549,22 +564,15 @@ class XEMCEvent
 					btb=Win_i.bt+Target.bt/2;//b*tb
 					bta=Win_f.bt+Target.bt/2;//b*ta
 				}
-
 				E_s_min=E_p/(1-2*E_p*sinsq_Angle/Target.M);
 				E_p_max=E_s/(1+2*E_s*sinsq_Angle/Target.M);
 				/*}}}*/
-
-				cs_qt=CalcuateQuasiTail(cs_q);
-				if(IsQFS)
-					tail=CalcuateTail();
-				else
-					tail=0.0; //Temperately disable the Tail since it is small at x>2 region,--Zhihong Ye,06/19/2012
-
+                
+				cs_qt=CalcuateQuasiTail(cs_q); //Quasi-Elastic Tail
+				tail=CalcuateTail(); //Elastic Tail
 				cs_Final=cs_qt+tail;//not minus,we simulate the real situation
 				//cerr <<Form("Radiated XS = %e", cs_Final)<<endl;
-
 			}
-
 			return 0;
 		}
 		/*}}}*/
@@ -590,6 +598,8 @@ class XEMCEvent
 			cs_b=sigma_b(cs_b_bt,cs_b_at)*lmulti_photon_cor*MEV2SR_TO_NBARNSR;
 			cs_b_bt *= lmulti_photon_cor*MEV2SR_TO_NBARNSR;
 			cs_b_at *= lmulti_photon_cor*MEV2SR_TO_NBARNSR;
+
+			cerr<<Form("--- Rad-Tail: mp_cor=%e,cs_p=%e,cs_ex=%e,cs_b=%e,cs_b_bt=%e,cs_b_at=%e --- ",mp_cor,cs_p,cs_ex,cs_b,cs_b_bt,cs_b_at)<<endl;
 
 			double lcs_int=cs_ex;
 			if ( IsAppro )
@@ -799,7 +809,7 @@ class XEMCEvent
 				//a=1.07A^1/3
 				//a is the root-mean-sqaure radium of the
 				//charge distribution
-				double lF;
+				double lF = 0.0;
 				//Phys.Rev.D 12,1884
 				//equ A18
 				double la=1.07*pow(Target.A,1/3.);
@@ -896,10 +906,12 @@ class XEMCEvent
 		/*}}}*/
 
 		/*double F_soft() const{{{*/
-		double F_soft() const
+		double F_soft() 
 		{
 			//Multiple-photon correction
 			//Phys.Rev.D 12,1884 (A58)
+			cerr<<Form(" --- In F_soft: 1=%e,2=%e,3=%e",
+					                   w_s/E_s,(btb+btr),w_p/(w_p+E_p))<<endl;
 			return pow(w_s/E_s,btb+btr)*pow(w_p/(E_p+w_p),btb+btr);
 		}
 		/*}}}*/
@@ -1017,8 +1029,13 @@ class XEMCEvent
 				lsigma_q+=sigma_resonance(1700.,Target.A,Target.Z,aEs,aEs-aEp,Angle_Deg,Fermi_Moment);//Resonace 1700 MeV
 				lsigma_q+=sigma_2N(Target.Z,Target.A,aEs,aEs-aEp,Angle_Deg,Fermi_Moment);//Dip region
 			}
-			else //XEMCFLAG 1->QE+DIS (warning, very slow!),2->QE only(default), 3->DIS only
-				lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),XEMCFLAG);
+			else{
+				//Born Cross Section Model from XEM, 
+				//Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only, 4->DIS_F1F2IN06 Only,
+				//              5->QE_DIS+F2ALLM+Coulomb Correction
+				//lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),5);
+				lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,xem_target,5);
+			}
 			/*}}}*/
 			return _F(lQ2)*lsigma_q;
 		}
@@ -1035,7 +1052,7 @@ class XEMCEvent
 			t0=1+0.5772*(bta+btb);
 			t1=2*AP*(-14/9.+13*log(aQ2/ELECTRON_MASS/ELECTRON_MASS)/12.);
 			t2=-AP*log(E_s/E_p)*log(E_s/E_p)/2;
-			t3=AP*(PI*PI/6.-DiLog(1-sinsq_Angle));
+			t3=AP*(PI*PI/6.-TMath::DiLog(1-sinsq_Angle));
 			return t0+t1+t2+t3;
 		}
 		/*}}}*/
@@ -1367,7 +1384,7 @@ class XEMCEvent
 			//aEPS: nucleon interaction energy
 			double GAMR=120; //no idea
 			double PFR=230; //no idea
-			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*DegToRad()/2),2); //no idea
+			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*TMath::DegToRad()/2),2); //no idea
 			double QVSRQ=QMSRQ+115*115; //no idea
 			double AP0=840; //no idea
 			double AP1=750; //no idea
@@ -1379,7 +1396,7 @@ class XEMCEvent
 				AP=AP0+(aA-1)*(AP1-AP0)/3;
 			else
 				AP=AP1;
-			double lth=aTheta*DegToRad();
+			double lth=aTheta*TMath::DegToRad();
 			double lQ2=4*aE*(aE-aomega)*sin(lth/2)*sin(lth/2);
 			double lq3mSQ=lQ2+aomega*aomega;
 
@@ -1440,9 +1457,9 @@ class XEMCEvent
 			//double AP1=750; //no idea
 			double GAMR=120; //no idea
 			double PFR=230; //no idea
-			double QMSR=4.*730.*(730.-390.)*pow(sin(37.1*DegToRad()/2.),2);
+			double QMSR=4.*730.*(730.-390.)*pow(sin(37.1*TMath::DegToRad()/2.),2);
 			double QVSR=QMSR+390.*390;
-			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*DegToRad()/2),2); //no idea
+			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*TMath::DegToRad()/2),2); //no idea
 			double QVSRQ=QMSRQ+115*115; //no idea
 			double QFDP=1.02e-7;//no idea
 			double GAMSPRD=140;
@@ -1467,7 +1484,7 @@ class XEMCEvent
 				GSPRDA=GAMSPRD;
 				AD=AD1;
 			}
-			double lth=aTheta*DegToRad();
+			double lth=aTheta*TMath::DegToRad();
 			double lQ2=4*aE*(aE-aomega)*sin(lth/2)*sin(lth/2);
 			double lq3mSQ=lQ2+aomega*aomega;
 			double result;
@@ -1486,7 +1503,7 @@ class XEMCEvent
 			result*=pow(FD(lQ2,AD),2)/pow(FD(QMSR,AD),2);
 			result*=lq3mSQ/QVSR;
 			result*=(lQ2/2./lq3mSQ+tan(lth/2.)*tan(lth/2));
-			result/=(QMSR/2./QVSR+pow(tan(37.1*DegToRad()/2.),2));
+			result/=(QMSR/2./QVSR+pow(tan(37.1*TMath::DegToRad()/2.),2));
 			result*=sigma_M(aE,aTheta)/sigma_M(730,37.1);
 			double WTHRESH = 4.*aE*aE*sin(lth/2.)*sin(lth/2.)+PI_MASS*PI_MASS+2.*PI_MASS*PROTON_MASS;
 			WTHRESH /= 2.*PROTON_MASS;
@@ -1553,7 +1570,7 @@ class XEMCEvent
 		double sigma_2N(const int& aZ,const double& aA,const double& aE,const double& aomega,const double& aTheta,const double& aPF)
 		{
 			//Dip region
-			double lth=aTheta*DegToRad();
+			double lth=aTheta*TMath::DegToRad();
 			double DM=1232.;
 			double A2=550.;
 			//  double PFR=60.;
@@ -1562,10 +1579,10 @@ class XEMCEvent
 			double GAMREF=300.;
 			double GAMR=GAMREF;
 			double SIGREF=0.20e-7;
-			double QMSR=4.*596.8*(596.8-380.)*pow(sin(60.*DegToRad()/2.),2);
+			double QMSR=4.*596.8*(596.8-380.)*pow(sin(60.*TMath::DegToRad()/2.),2);
 			double QVSR=QMSR+380.*380;
 			double SIGKIN=0.5*sigma_M(596.8e0,60.);
-			SIGKIN=SIGKIN*(QMSR/2./QVSR+pow(tan(60.*DegToRad()/2.),2));
+			SIGKIN=SIGKIN*(QMSR/2./QVSR+pow(tan(60.*TMath::DegToRad()/2.),2));
 			SIGKIN=SIGKIN*QVSR*pow(FD(QMSR,A2),2);
 			SIGKIN=SIGKIN*GAMR/GAMREF;
 			double SIGCON=SIGREF/SIGKIN;
@@ -1599,13 +1616,13 @@ class XEMCEvent
 		double sigma_resonance(const double& aRes_Energy,const double& aA,const double& aZ,const double& aE,const double& aomega,const double& aTheta,const double& aPF)
 		{
 			//resonace
-			double lth=aTheta*DegToRad();
+			double lth=aTheta*TMath::DegToRad();
 			double PFR=230.;
 			double EPSR=0.;
-			double AR0;
-			double AR1;
-			double QFRP;
-			double VPHOTONE;
+			double AR0=0.;
+			double AR1=0.;
+			double QFRP=0.;
+			double VPHOTONE=0.;
 			if ( fabs(aRes_Energy-1500)<1e-3 )
 			{
 				AR0=1000.;
@@ -1624,12 +1641,12 @@ class XEMCEvent
 			double GAMSPRD=140.;
 			double GAMR=110.;
 			double GAMPI=5.;
-			double QMSQFR=4.*730.*(730.-115.)*pow(sin(37.1*DegToRad()/2.),2);
+			double QMSQFR=4.*730.*(730.-115.)*pow(sin(37.1*TMath::DegToRad()/2.),2);
 			double QVSQFR=QMSQFR+115.*115;
-			double QMSRR=4.*10000.*(10000.-VPHOTONE)*pow(sin(6.*DegToRad()/2.),2);
+			double QMSRR=4.*10000.*(10000.-VPHOTONE)*pow(sin(6.*TMath::DegToRad()/2.),2);
 			double QVSRR=QMSRR+VPHOTONE*VPHOTONE;
 			double SIGREF=pow(FD(QMSRR,AR0),2)*QVSRR;
-			SIGREF=SIGREF*(QMSRR/2./QVSRR+pow(tan(6.*DegToRad()/2.),2));
+			SIGREF=SIGREF*(QMSRR/2./QVSRR+pow(tan(6.*TMath::DegToRad()/2.),2));
 			SIGREF=SIGREF*sigma_M(10000.e0,6.);
 			int NA=int(aA);
 			double QFR,GSPRDA,AR;
@@ -1727,7 +1744,7 @@ class XEMCEvent
 		/*double Recoil(const double& aE,const double& aTheta,const double& aM){{{*/
 		double Recoil(const double& aE,const double& aTheta,const double& aM)
 		{
-			return 1/(1+aE*(1-cos(aTheta*DegToRad()))/aM);
+			return 1/(1+aE*(1-cos(aTheta*TMath::DegToRad()))/aM);
 		}
 		/*}}}*/
 
@@ -1780,8 +1797,11 @@ class XEMCEvent
 		}
 		/*}}}*/
 
+    private:
+        XEM_TGT *xem_target;
 
-	public:
+
+    public:
 		//Not safe, but it's ok for physicsists
 		/*Member Data from file{{{*/
 		double theta; //scattering angle(deg)
@@ -1799,8 +1819,10 @@ class XEMCEvent
 
 
 		double cs_M; //Mott Cross Section
+		double cs_Final; //Mott Cross Section
 		double cs_Born; //Born Cross Section from XEMC
-		double cs_Final; //Radiated Cross Section if inlucding rediative effect
+		double cs_qe; //Radiated Cross Section if inlucding rediative effect
+		double cs_dis; //Radiated Cross Section if inlucding rediative effect
 
 		/*only for RadCor{{{*/
 		double cs_qfs;//quasi-free scattering cross section
@@ -1844,8 +1866,14 @@ class XEMCEvent
 		bool IsRadCor; //enable Radiative correction
 		bool IsQFS; //enable QFS to calcualte xs instead of XEMC
 		bool IsQFS_Q2dep; //enable Q2 dependence when calculating Q.E. Peak
+		bool IsBump; 
+		double Target_Up_bt;
+		double Target_Up_TR;
+		double Target_Down_bt;
+		double Target_Down_TR;
 
-		/*Only for Tail{{{*/
+
+		/*Only for T ail{{{*/
 		int Form_Factor_Id; //which form factor used
 		bool  IsInternal_Bre; //enable/disable internal bremsstrahlung
 		bool  IsExternal_Bre; //enable/disable external bremsstrahlung
@@ -1888,21 +1916,15 @@ class XEMCEvent
 		double q2;//q2=-Q2 MeV*MeV
 		/*}}}*/
 
-		/*Member Data{{{*/
+		/*Member Data {{{*/
 		double beam_x; //cm
 		double beam_y; //cm
-		double reactz_gen;
 		double D_x;
 		double D_y;
 		double HRS_L;
 		double E_s;//=incident beam energy (MeV)
 		double E_p;//=incident beam energy (MeV)
-        bool IsBump;
-		double Target_Up_bt;
-		double Target_Up_TR;
-		double Target_Down_bt;
-		double Target_Down_TR;
-
+		double reactz_gen;
 		/*void Print(){{{*/
 		void Print()
 		{
@@ -1926,7 +1948,7 @@ class XEMCEvent
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"beam_y",    10,beam_y,    8,"cm",            40,"(Beam Y)");
 
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"Angle",     10,Angle,     8,"rad",           40,"(real scattering angle[rad])");
-			printf("%-*s=%*.2f %-*s %-*s\n",15,"Angle",     10,Angle*RadToDeg(),     9,"\xc2\xb0",           40,"(real scattering angle[deg])");
+			printf("%-*s=%*.2f %-*s %-*s\n",15,"Angle",     10,Angle*TMath::RadToDeg(),     9,"\xc2\xb0",           40,"(real scattering angle[deg])");
 			printf("%-*s=%*.2e %-*s %-*s\n",15,"Q2",        10,Q2,        9,"MeV\xc2\xb2",   40,"(Q\xc2\xb2)");
 			printf("%-*s=%*.2e %-*s %-*s\n",15,"q2",        10,q2,        9,"MeV\xc2\xb2",   40,"(-Q\xc2\xb2)");
 			printf("%-*s=%*.2e %-*s %-*s\n",15,"btr",       10,btr,       8,"rad_len",       40,"(b*tr equivalent radiator unit in rad_len)");

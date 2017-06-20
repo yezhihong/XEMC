@@ -7,16 +7,16 @@ inline void gCal_DIS(double kE0,double kEp,double kTheta, XEM_TGT* kTarget,doubl
 	*/
 	Int_t A,Z,N;
 	Double_t f0,a,b,B,alpha,esep,resol;
-	A = kTarget->A;
-	Z = kTarget->Z;
+	A = kTarget->GetA();
+	Z = kTarget->GetZ();
 	N = A - Z;
-	esep = kTarget->ESep;
-	resol = kTarget->Resol;
-	f0 = kTarget->f0;
-	B = kTarget->B;
-	a = kTarget->a;
-	b = kTarget->b;
-	alpha = kTarget->alpha;
+	esep = kTarget->GetFyPar("ESep");
+	resol = kTarget->GetFyPar("Resol");
+	f0 = kTarget->GetFyPar("f0");
+	B = kTarget->GetFyPar("B");
+	a = kTarget->GetFyPar("a");
+	b = kTarget->GetFyPar("b");
+	alpha = kTarget->GetFyPar("alpha");
 
 	f0*=1000;
 	B*=1000;

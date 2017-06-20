@@ -12,14 +12,12 @@ class XEM_TGT
     public:
         XEM_TGT() {
         }
-
-        /*~XEM_TGT{{{*/
         virtual ~XEM_TGT(){
 
         }
-        /*}}}*/
 
-        void GetTargetPar(const TString& kTarget_Table,  const int kA, const int kZ ){/*{{{*/
+        void GetTargetPar(const TString& kTarget_Table,  const int kA, const int kZ ){
+            //fTarget_Table=kTarget_Table;
             cout<<"&&&& XEM_TGT: Loading Table from "<<kTarget_Table.Data()<<endl;
             ifstream table; 
             table.open(kTarget_Table.Data());
@@ -44,41 +42,29 @@ class XEM_TGT
                     content.ReadLine(table);
                 else{
                     table >> name1 >> A1 >> Z1 >> mass1 >> RL1 >> Resol1 >>ESep1 >> f01>> B1>>a1>>b1>>alpha1;
-                    cout<<Form("--- Name = %s, A = %d, Z = %d", name1.Data(), A1, Z1)<<endl;
 
                     if((A1==kA)&&(Z1==kZ)){
-                        cout<<"A"<<endl;
-                        Name = name1;
-                        cout<<"B"<<endl;
+                        cout<<Form("--- Name = %s, A = %d, Z = %d", name1.Data(), A1, Z1)<<endl;
+                        //Name = name1;
                         A = A1;
-                        cout<<"C"<<endl;
                         Z = Z1;
-                        cout<<"D"<<endl;
                         Mass = mass1;
-                        cout<<"E"<<endl;
                         RL = RL1;
-                        cout<<"F"<<endl;
                         Resol = Resol1;
-                        cout<<"G"<<endl;
                         ESep = ESep1;
-                        cout<<"H"<<endl;
                         f0 = f01;
                         B = B1;
                         a = a1;
                         b = b1;
                         alpha = alpha1;
 
-                        cout<<"I"<<endl;
                         fExist = kTRUE;
-                        cout<<"J"<<endl;
                         break;
                     }
                 }
             }
-            cout<<"--EE"<<endl;
             table.close();
 
-            cout<<"--FF"<<endl;
             //Be careful -- the following variables needed to be converted:
             Mass *= U2GeV ; //From u to GeV;
             ESep/=1000.0; 
@@ -87,19 +73,15 @@ class XEM_TGT
             a /=1000.0;
             b /=1000.0;
 
-            cout<<"--GF"<<endl;
             if(!(fExist)){
                 //     cerr <<endl<< "@@@@@@ I have found your target from the table!" <<endl;
                 //  else{
                 cerr << "****** ERROR, your target is not in the table! Check the following table:" <<endl;
                 List();
             }
-
-            //fTarget_Table=kTarget_Table;
             }
-            /*}}}*/
 
-            void SetValue(/*{{{*/
+            void SetValue(
                     const TString kName=" ",
                     const Double_t& kMass=0,
                     const Int_t& kA=0,
@@ -126,9 +108,8 @@ class XEM_TGT
                 b=kb;
                 alpha=kalpha;
             }
-/*}}}*/
-           
-            void List(){/*{{{*/
+
+            void List(){
                 ifstream table(fTarget_Table.Data());
                 TString content; 
                 cerr <<endl<< "~~~~~~~~~~~~~~~~~ Target Table ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
@@ -158,9 +139,9 @@ class XEM_TGT
                 Printf("%-*s%f",20,"|   alpha:  ",alpha);
                 cerr << "--------------------------------------"<<endl<<endl;
 
-            }/*}}}*/
+            }
 
-            public:
+            private:
             //Very Dangerous but I have no choice unless I change the entire code, too late so far
             TString Name;  // Target Name
             Double_t Mass; // Target Mass
@@ -176,9 +157,8 @@ class XEM_TGT
             Double_t b;
             Double_t alpha; //parameters to calculate F(y)
 
-            private:
             Bool_t fExist;
             TString fTarget_Table;
         };
 
-/*#endif*/
+        /*#endif*/

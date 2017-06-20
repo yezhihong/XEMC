@@ -64,9 +64,7 @@
 
 using namespace std;
 
-const TString TARGET_TABLE_DEFAULT = "/work/halla/e08014/disk1/yez/XEMC/SRC/target.table";
-#include "XEM_Target.h"
-  
+ 
 class XEM_VAR2/*{{{*/
 {
  public:
@@ -299,6 +297,31 @@ inline Double_t gGet_Max(double a, double b){/*{{{*/
   } 
 }/*}}}*/
 
+/*inline vector<TString> Tokens(TString aline,TString aDelim=" "){{{*/
+inline vector<TString> Tokens(TString aline,TString aDelim=" ")
+{
+	Int_t i;
+	TObjArray* InObjArray;
+	TObjString* os;
+	TString s;
+	vector<TString> OutStringVec;
+	OutStringVec.clear();
+
+	InObjArray=aline.Tokenize(aDelim);
+	for ( i=0; i<InObjArray->GetEntriesFast(); i++ )
+	{
+		os=(TObjString*)InObjArray->At(i);
+		s=os->GetString();
+		OutStringVec.push_back(s);
+	}
+	return OutStringVec;
+}
+/*}}}*/
+
+const TString TARGET_TABLE_DEFAULT = "/work/halla/e08014/disk1/yez/XEMC/SRC/target.table";
+//#include "XEM_Target.h"
+#include "XEM_TGT.h"
+ 
 //Subroutines in XEM_SigCal.h
 inline Double_t gGet_EMC_Func(Int_t aA, Double_t aXbj);
 inline Double_t gGet_EMC_Func_Slac(Int_t aA, Double_t aXbj);
