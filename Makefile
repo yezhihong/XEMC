@@ -18,18 +18,13 @@ RTLIBS := -L${ROOTSYS}/lib -lCore
 all: $(PROGRAM)
 
 
-$(PROGRAM): $(PROGRAM).o $(XEMCDIR)/SRC/XEM_TGT.o
-	g++ -o $(PROGRAM) $(PROGRAM).o $(XEMCDIR)/SRC/XEM_TGT.o $(CFLAGS) $(LIBS) $(RTLIBS) 
-	#clang++ -o $(PROGRAM) $(PROGRAM).o $(XEMCDIR)/SRC/XEM_TGT.o $(CFLAGS) $(LIBS) $(RTLIBS) 
+$(PROGRAM): $(PROGRAM).o 
+	g++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) 
+	#clang++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) 
 
 $(PROGRAM).o: $(PROGRAM).C
 	g++ $(CFLAGS) -c -o $(PROGRAM).o $(PROGRAM).C ${INCLUDE}
 	#clang++ $(CFLAGS) -c -o $(PROGRAM).o $(PROGRAM).C ${INCLUDE}
-
-$(XEMCDIR)/SRC/XEM_TGT.o: $(XEMCDIR)/SRC/XEM_TGT.C
-	g++ $(CFLAGS) -c -o $(XEMCDIR)/XEM_TGT.o $(XEMCDIR)/SRC/XEM_TGT.C ${INCLUDE}
-	#clang++ $(CFLAGS) -c -o $(XEMCDIR)/SRC/XEM_TGT.o $(XEMCDIR)/SRC/XEM_TGT.C ${INCLUDE}
-
 
 clean:
 	rm -f *.o ./SRC/*.o	

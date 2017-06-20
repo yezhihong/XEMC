@@ -41,40 +41,33 @@ class XEMCEvent
 		virtual ~XEMCEvent()
 		{
 			Win_Before_Mag.clear();
-                        Win_After_Mag.clear();
-                        delete xem_target;
+			Win_After_Mag.clear();
 		}
 		/*}}}*/
 
-                XEMCEvent(XEMCEvent const&){};
-                //XEMCEvent& operator=(XEMCEvent const&){};
+		XEMCEvent(XEMCEvent const&){};
+		//XEMCEvent& operator=(XEMCEvent const&){};
 
-                /*void Init(){{{*/
-                void Init()
-                {
-                    //xem_target = new XEM_TGT();
-                    Win_Before_Mag.clear();
-                    Win_After_Mag.clear();
-                };
-                /*}}}*/
+		/*void Init(){{{*/
+		void Init()
+		{
+            XEMC_Target=new XEM_TGT();
+            XEMC_Target->GetValueAZ(Target.A,Target.Z);
+		};
+		/*}}}*/
 
-                /*int Set_XEMCTargetPar(const TString kTarget_Table){{{*/
-                void Set_XEMCTargetPar(const TString& kTarget_Table, int kA, int kZ)
-                {  
-                    xem_target->GetTargetPar(kTarget_Table.Data(), kA, kZ);
-                }
-                /*}}}*/
+		/*int Run(){{{*/
+		int Run()
+		{   
+            Win_Before_Mag.clear();
+            Win_After_Mag.clear();
+            SetTarget();//Define Target Materials, like Windowns and Chambers
 
-                /*int Run(){{{*/
-                int Run()
-                {   
-                    int Num_Event_Add=0;
-                    SetTargetMaterials();//Define Target Materials, like Windowns and Chambers
-                    Num_Event_Add=CalcXS();//Calculate Cross Sections
-
-                    return Num_Event_Add;
-                }
-                /*}}}*/
+            int Num_Event_Add=0;
+            Num_Event_Add=CalcXS();//Calculate Cross Sections
+			return Num_Event_Add;
+		}
+		/*}}}*/
 
 		/*void AddOneMaterial(vector<Material>& aWin,const double& aX0,const double& arho,const double& aL,const double& aA,const int& aZ,string aName){{{*/
 		void AddOneMaterial(vector<Material>& aWin,const double& aX0,const double& arho,const double& aL,const double& aA,const int& aZ,string aName)
@@ -103,8 +96,8 @@ class XEMCEvent
 		/*}}}*/
 
 	private:
-		/*void SetTargetMaterials(){{{*/
-		void SetTargetMaterials()
+		/*void SetTarget(){{{*/
+		void SetTarget()
 		{
 			//set value for Member Data derived from variables from file
 			//File provides E_s,theta,Target.(Z,A,T,rho) Win_i.(Z,A,T,rho)
@@ -507,7 +500,7 @@ class XEMCEvent
 				q2=-Q2;
 			}
 			/*}}}*/
-
+  
 			cs_M=sigma_M(E_s,Angle_Deg);
 
 			/*{{{Born Crosss Section Model*/
@@ -525,10 +518,8 @@ class XEMCEvent
 			}
 			else{ //ZYE
 				//Born Cross Section Model from XEM, Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only 4->DIS_F1F2IN06_XEM Only
-				//cs_qe = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),2); 
-				//cs_dis = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),3); 
-                cs_qe = XEMC_Born(E_s,E_p,Angle_Deg,xem_target,2); 
-                cs_dis = XEMC_Born(E_s,E_p,Angle_Deg,xem_target,3); 
+				cs_qe = XEMC_Born(E_s,E_p,Angle_Deg,XEMC_Target,2); 
+				cs_dis = XEMC_Born(E_s,E_p,Angle_Deg,XEMC_Target,3);
 				cs_Born = cs_qe + cs_dis; 
 			}
 			cs_Final = cs_Born;
@@ -599,7 +590,7 @@ class XEMCEvent
 			cs_b_bt *= lmulti_photon_cor*MEV2SR_TO_NBARNSR;
 			cs_b_at *= lmulti_photon_cor*MEV2SR_TO_NBARNSR;
 
-			cerr<<Form("--- Rad-Tail: mp_cor=%e,cs_p=%e,cs_ex=%e,cs_b=%e,cs_b_bt=%e,cs_b_at=%e --- ",mp_cor,cs_p,cs_ex,cs_b,cs_b_bt,cs_b_at)<<endl;
+			//cerr<<Form("--- Rad-Tail: mp_cor=%e,cs_p=%e,cs_ex=%e,cs_b=%e,cs_b_bt=%e,cs_b_at=%e --- ",mp_cor,cs_p,cs_ex,cs_b,cs_b_bt,cs_b_at)<<endl;
 
 			double lcs_int=cs_ex;
 			if ( IsAppro )
@@ -910,8 +901,8 @@ class XEMCEvent
 		{
 			//Multiple-photon correction
 			//Phys.Rev.D 12,1884 (A58)
-			cerr<<Form(" --- In F_soft: 1=%e,2=%e,3=%e",
-					                   w_s/E_s,(btb+btr),w_p/(w_p+E_p))<<endl;
+			/*cerr<<Form(" --- In F_soft: 1=%e,2=%e,3=%e",*/
+									   /*w_s/E_s,(btb+btr),w_p/(w_p+E_p))<<endl;*/
 			return pow(w_s/E_s,btb+btr)*pow(w_p/(E_p+w_p),btb+btr);
 		}
 		/*}}}*/
@@ -1033,8 +1024,7 @@ class XEMCEvent
 				//Born Cross Section Model from XEM, 
 				//Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only, 4->DIS_F1F2IN06 Only,
 				//              5->QE_DIS+F2ALLM+Coulomb Correction
-				//lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),5);
-				lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,xem_target,5);
+				lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,XEMC_Target,5);
 			}
 			/*}}}*/
 			return _F(lQ2)*lsigma_q;
@@ -1797,11 +1787,8 @@ class XEMCEvent
 		}
 		/*}}}*/
 
-    private:
-        XEM_TGT *xem_target;
 
-
-    public:
+	public:
 		//Not safe, but it's ok for physicsists
 		/*Member Data from file{{{*/
 		double theta; //scattering angle(deg)
@@ -1817,8 +1804,8 @@ class XEMCEvent
 		//----
 		/*}}}*/
 
-
-		double cs_M; //Mott Cross Section
+        XEM_TGT* XEMC_Target; 
+        double cs_M; //Mott Cross Section
 		double cs_Final; //Mott Cross Section
 		double cs_Born; //Born Cross Section from XEMC
 		double cs_qe; //Radiated Cross Section if inlucding rediative effect

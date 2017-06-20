@@ -21,6 +21,7 @@ class XEM_TGT{
 
     public:
         void GetTargetPar(const TString& kTarget_Table, const int kA, const int kZ);
+        void GetTargetPar2(const TString& kTarget_Table, const int kA, const int kZ);
         TString GetName();
         Int_t GetA();
         Int_t GetZ();

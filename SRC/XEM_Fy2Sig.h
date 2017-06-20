@@ -63,20 +63,20 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
   Double_t fact=0.,sig_p=0.,sig_n=0.,sig_out=0.;
   Double_t dwdy = Qv/sqrt(PM_SQ+Qv2+y_cal*y_cal+2.0*y_cal*Qv);
   
-   if(aTarget->GetA() > 1.5){
+   if(aTarget->A > 1.5){
     XEM_VAR2* sig_np = new XEM_VAR2();
     gGet_Sig_Bar_DF(aE0,aEp,aTheta,y_cal,0.0,sig_np);
     sig_p = sig_np->First/1000.0;
     sig_n = sig_np->Second/1000.0;
-    fact = (aTarget->GetZ()*sig_p+(aTarget->GetA()-aTarget->GetZ())*sig_n)/dwdy;
+    fact = (aTarget->Z*sig_p+(aTarget->A-aTarget->Z)*sig_n)/dwdy;
     delete sig_np;
    }
   else 
     fact=0.0;
 
   //const Double_t Xbj_Max_He3 = 2.85; 
-  //if(aTarget->GetA()==3 &&aTarget->GetZ()==2 && x_local >= Xbj_Max_He3)
-  if(aTarget->GetA()==3 &&aTarget->GetZ()==2) // New twist for He3 only, -- Z. Ye 05/19/2014
+  //if(aTarget->A==3 &&aTarget->Z==2 && x_local >= Xbj_Max_He3)
+  if(aTarget->A==3 &&aTarget->Z==2) // New twist for He3 only, -- Z. Ye 05/19/2014
   //if(0) // New twist for He3 only, -- remove this feature, Z. Ye 11/08/2016
 	  sig_out = fact*gGet_He3_Fy(y_cal,aTarget)*1e6;//Add a flat tail for He3 at y<0.80
   else
@@ -85,15 +85,15 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
   /*Old Correction not in used{{{*/
  /* 
   Double_t johns_fac=1.0;
-  if (aTarget->GetA()==3)
+  if (aTarget->A==3)
     johns_fac=gGet_Max(1.,1.+y_cal*1.4*2.5);
-  else if (aTarget->GetA()==4)
+  else if (aTarget->A==4)
     johns_fac=gGet_Max(1.,1.+y_cal*1.4*1.75);
-  else if ((aTarget->GetA()==9)||(aTarget->GetA()==12))  
+  else if ((aTarget->A==9)||(aTarget->A==12))  
     johns_fac=gGet_Max(1.,1.+y_cal*1.4*2.5);
-  else if ((aTarget->GetA()==56)||(aTarget->GetA()==64))
+  else if ((aTarget->A==56)||(aTarget->A==64))
     johns_fac=gGet_Max(1.,1.+y_cal*1.4*3);
-  else if (aTarget->GetA()==197)
+  else if (aTarget->A==197)
     johns_fac=gGet_Max(1.,1.+y_cal*1.4*4);
   
 //  sig_out*=johns_fac;
@@ -102,8 +102,8 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
     x_local=2.0;
   
   Double_t x_low=0.0,x_high=2.0;
-  if(aTarget->GetA()>2){
-    if((aTarget->GetA()==64)||(aTarget->GetA()==4)||(aTarget->GetA()==197)){
+  if(aTarget->A>2){
+    if((aTarget->A==64)||(aTarget->A==4)||(aTarget->A==197)){
       x_low=1.2;
       x_high=1.4;
     }
@@ -112,7 +112,7 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
       x_high=1.6;
     }
   }
-  else  if(aTarget->GetA()==2){
+  else  if(aTarget->A==2){
     x_low=1.4;
     x_high=1.45;
   }
@@ -120,7 +120,7 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
   Double_t corfact=1.0;
   Double_t my_frac=1.0;
   if(x_local>=x_low){ 
-    corfact=  gGet_Tail_Corr(aTarget->GetA(),x_local);
+    corfact=  gGet_Tail_Corr(aTarget->A,x_local);
     if(x_local<x_high){
       my_frac=(x_local-x_low)/(x_high-x_low);	      
       corfact=my_frac*corfact+(1.0-my_frac);
@@ -147,11 +147,11 @@ inline Double_t gGet_Y(double vE0, double vEp, double vTheta, XEM_TGT* vTarget)
   Double_t Qv = sqrt(Qv2);
 
   //Solving y
-  Double_t Mass_A = vTarget->GetFyPar("Mass");
+  Double_t Mass_A = vTarget->Mass;
 
   Double_t y_cal=0.0;
   Double_t Mrec = P_MASS;
-  Double_t Mass_A_1 = Mass_A + vTarget->GetFyPar("ESep") - Mrec; //Mass of (A-1) system
+  Double_t Mass_A_1 = Mass_A + vTarget->ESep - Mrec; //Mass of (A-1) system
   Double_t temp, coeff_a, coeff_b, coeff_c,root2;
   
   temp = Qv2 + Mrec*Mrec - Mass_A_1*Mass_A_1 - (Mass_A+nu)*(Mass_A+nu);
@@ -172,13 +172,13 @@ inline Double_t gGet_Fy(double vY, XEM_TGT* vTarget)
 {
   Double_t fy,y,f0,B,alpha,a,b;
   y=1000.0*vY;
-  f0 = vTarget->GetFyPar("f0");
-  B = vTarget->GetFyPar("B");
-  a = vTarget->GetFyPar("a");
-  b = vTarget->GetFyPar("b");
-  alpha = vTarget->GetFyPar("alpha");
+  f0 = vTarget->f0;
+  B = vTarget->B;
+  a = vTarget->a;
+  b = vTarget->b;
+  alpha = vTarget->alpha;
 
-  if(vTarget->GetA()==2)
+  if(vTarget->A==2)
     fy = (f0-B)*alpha*alpha*exp(-(a*y)*(a*y))/(alpha*alpha+y*y)+B*exp(-b*abs(y));
   else
     fy = (f0-B)*alpha*alpha*exp(-(a*y)*(a*y))/(alpha*alpha+y*y)+B*exp(-(b*y)*(b*y));
@@ -192,11 +192,11 @@ inline Double_t gGet_He3_Fy( double vY, XEM_TGT* vTarget){
   //This is a special function for He3 only to prevent the He3 Fy falls to zero quickly when x->3
   // -- Z. Ye, 05/19/2014
   Double_t fy,y,f0,B,alpha,a,b;
-  f0 = vTarget->GetFyPar("f0");
-  B = vTarget->GetFyPar("B");
-  a = vTarget->GetFyPar("a");
-  b = vTarget->GetFyPar("b");
-  alpha = vTarget->GetFyPar("alpha");
+  f0 = vTarget->f0;
+  B = vTarget->B;
+  a = vTarget->a;
+  b = vTarget->b;
+  alpha = vTarget->alpha;
  
   const double Y_Max_He3 = -0.8; //-0.8 roughly corresponds to xbj->3
   if(vY>Y_Max_He3)

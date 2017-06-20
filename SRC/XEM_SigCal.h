@@ -62,27 +62,27 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
 // deltae_cc = (1.5)*(Z/R)*(hbar*c)*alpha*0.775
 // the 0.775 comes from Aste EPJ A 26 167 (2005)
 // also, all deltae_cc's are computed for Z-1, not Z!/-*    
-    if(kTarget->GetA()==1) //  !Hydrogen
+    if(kTarget->A==1) //  !Hydrogen
 		DeltaE = 0.0;
-	else if(kTarget->GetA()==2) // !Deuterium
+	else if(kTarget->A==2) // !Deuterium
 		DeltaE = 0.0;
-	else if(kTarget->GetA()==3) // !Helium-3
+	else if(kTarget->A==3) // !Helium-3
 		DeltaE = 0.0; //0.00085;
-	else if(kTarget->GetA()==4) // !Helium-4
+	else if(kTarget->A==4) // !Helium-4
 		DeltaE = 0.0; //0.0010;
-	else if(kTarget->GetA()==9) // !Beryllium
+	else if(kTarget->A==9) // !Beryllium
 		DeltaE = 0.001875;
-	else if(kTarget->GetA()==12) // !Carbon
+	else if(kTarget->A==12) // !Carbon
 		DeltaE = 0.00292;
-	else if(kTarget->GetA()==27) // !Aluminum
+	else if(kTarget->A==27) // !Aluminum
 		DeltaE = 0.0061;
-	else if(kTarget->GetA()==40) // !Cacium-40
+	else if(kTarget->A==40) // !Cacium-40
 		DeltaE = 0.00743;
-	else if(kTarget->GetA()==48) // !Cacium-48
+	else if(kTarget->A==48) // !Cacium-48
 		DeltaE = 0.00699;
-	else if(kTarget->GetA()==64) // !Copper
+	else if(kTarget->A==64) // !Copper
 		DeltaE = 0.0102;
-	else if(kTarget->GetA()==197) // !Gold
+	else if(kTarget->A==197) // !Gold
 		DeltaE = 0.0199;
 	else{
 		cerr<<"**** Target not in the list! Coulumb Correction give up~ "<<endl;
@@ -96,7 +96,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   Double_t Ep_cc = kEp + DeltaE;
 
   if(kFlag==1 || kFlag ==2 || kFlag ==5){
-    if(kTarget->GetA() > 1.5)
+    if(kTarget->A > 1.5)
       gCal_Fy2Sig(E0_cc,Ep_cc,kTheta,kTarget,Sig_QE);
     else
       Sig_QE->Value = 0.0;
@@ -114,7 +114,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
       //Double_t TN_Theta = tan(kTheta/2.0);
       //Double_t CS_SQ = CS_Theta*CS_Theta;
 
-      //Double_t aTarget_Mass = kTarget->GetFyPar("Mass");
+      //Double_t aTarget_Mass = kTarget->Mass;
       //Double_t Qsq = 4.0*E0_cc*Ep_cc*SN_SQ;
       //Double_t nu = E0_cc - Ep_cc;
       //Double_t xbj = Qsq/2.0/P_MASS/nu;
@@ -127,7 +127,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
       //Double_t pmax=1.0;
       //Double_t x1 = 0.8, x2 = 0.9;
       //Int_t innt=0,innp=0;
-      //if(kTarget->GetA()>=2){//could be a bug, since gCal_DIS does not include A==2
+      //if(kTarget->A>=2){//could be a bug, since gCal_DIS does not include A==2
       //if(Wsq<2.25){
       //innp = 30; innt = 30;
       //}
@@ -141,10 +141,10 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
       //gCal_DIS(E0_cc,Ep_cc,kTheta,kTarget,pmax,innt,innp,Sig_Donal);
 
       //if(xbj<x1)
-      //EMC_Corr = gGet_EMC_Func(kTarget->GetA(),xbj);
+      //EMC_Corr = gGet_EMC_Func(kTarget->A,xbj);
       //else if(xbj>=x1 && xbj<x2){
       //Frac = (xbj-x1)/(x2-x1);
-      //EMC_Corr = 1.0*Frac + gGet_EMC_Func(kTarget->GetA(),xbj)*(1.0 - Frac);
+      //EMC_Corr = 1.0*Frac + gGet_EMC_Func(kTarget->A,xbj)*(1.0 - Frac);
       //}
       //else
       //EMC_Corr = 1.0;   
@@ -154,7 +154,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
       ////DEBUG
       //}// if(iA>=2){
       //else{
-      //gCal_F1F2In06(kTarget->GetA(),kTarget->GetZ(),Qsq,Wsq,F);
+      //gCal_F1F2In06(kTarget->A,kTarget->Z,Qsq,Wsq,F);
       //W->First = F->First/P_MASS;
       //W->Second = F->Second/nu;
 
@@ -163,8 +163,8 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
       //} //if(iA<2){
 
       ////Do a high x tweak for the inelastic part of nuc targets
-      //if(xbj>0.9 && kTarget->GetA()>1.5)
-      //sig_dis*=gGet_Dis_HighX_Cor(kTarget->GetA(),xbj);
+      //if(xbj>0.9 && kTarget->A>1.5)
+      //sig_dis*=gGet_Dis_HighX_Cor(kTarget->A,xbj);
 
       //if(sig_dis<0.0)
       //sig_dis = 0.0;
@@ -177,7 +177,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
               //-- replaced with "DIS.h" which includes three DIS models, including PB,
               //and remove compiling the fortran code -- Zhihoong Ye, 05/30/2017
               /*Note: this needs the fortran PB code, not in used anymore{{{*/
-              //gCal_F1F2(kTarget->GetA(),kTarget->GetZ(),Qsq,Wsq,F); 
+              //gCal_F1F2(kTarget->A,kTarget->Z,Qsq,Wsq,F); 
               //W->First = F->First/P_MASS;
               //W->Second = F->Second/nu;
               //Double_t sig_mott = pow((19732.0/(2.0*137.0388*E0_cc*SN_SQ)),2)*pow(CS_SQ,1)/1e6;
@@ -187,16 +187,16 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
               //Using F2ALLM97 model:--Z. Ye 05/30/2017
               DIS *dis = new DIS();
               dis->SetKin(kE0, kEp, kTheta);//GeV,GeV/c, Radius
-              Double_t Sigma_DIS = dis->Sigma(kTarget->GetA(), kTarget->GetZ());//nbarn/sr/GeV
+              Double_t Sigma_DIS = dis->Sigma(kTarget->A, kTarget->Z);//nbarn/sr/GeV
               sig_dis = Sigma_DIS/1000.0; //nb/sr/MeV
 
               /*Christy&Bosted's DIS model, Need christy_bosted_inelastic.h{{{*/ //--Z. Ye 05/30/2017
               //double xs_p = sigma_p(kE0, kTheta, kEp);//Peter Bosted's DIS model
               //double xs_n = sigma_n(kE0, kTheta, kEp);//Peter Bosted's DIS model
               //double xs_d = sigma_d(kE0, kTheta, kEp);//Peter Bosted's DIS model
-              //if(kTarget->GetA()==3&&kTarget->GetZ()==1) sig_dis = xs_n + xs_d;
-              //else if(kTarget->GetA()==3&&kTarget->GetZ()==2) sig_dis = xs_p + xs_d;
-              //else sig_dis = kTarget->GetZ() * xs_p + (kTarget->GetA()-kTarget->GetZ())*xs_n;
+              //if(kTarget->A==3&&kTarget->Z==1) sig_dis = xs_n + xs_d;
+              //else if(kTarget->A==3&&kTarget->Z==2) sig_dis = xs_p + xs_d;
+              //else sig_dis = kTarget->Z * xs_p + (kTarget->A-kTarget->Z)*xs_n;
               //sig_dis /= 1000.0; //nb/sr/MeV
               /*}}}*/
 
