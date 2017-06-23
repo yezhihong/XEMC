@@ -92,6 +92,8 @@ class DIS{
             double F2 = GetF2(kNucleon.c_str());
             xs = 4.0 * pow(1/137.036, 2) * fEp*fEp / fQ2/fQ2 
                 * (1./fNu * fCosSQ + 1/0.938272/fXbj * fSinSQ) * F2*GeV2_to_nbarn;
+            if(isnan(xs)||isinf(xs))
+                xs = 1e-33;
             return xs;
         }
         /*}}}*/
@@ -105,6 +107,9 @@ class DIS{
                 xs = Sigma("Deutron")+Sigma("Proton");
             else
                 xs = (kZ*Sigma("Proton")+(kA-kZ)*Sigma("Neutron"));
+            
+            if(isnan(xs)||isinf(xs))
+                xs = 1e-33;
             return xs;
         }
         /*}}}*/

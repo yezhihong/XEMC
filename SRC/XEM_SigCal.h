@@ -1,5 +1,6 @@
 //                           GeV     GeV            Rad
 #include "DIS_Lite.h"
+#include "XEM_F1F2.h"
 //#include "christy_bosted_inelastic.h"
 inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool kCCor, int kFlag, XEM_XS* sig)
 {
@@ -104,6 +105,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   }//if(kFlag==1 || kFlag ==2)
      
   sig_dis =0.0;
+  // DIS *dis = new DIS();
   if(kFlag==1 || kFlag ==3 || kFlag==4|| kFlag ==5){
 
       /*OLD DIS FIT{{{*/
@@ -177,18 +179,32 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
               //-- replaced with "DIS.h" which includes three DIS models, including PB,
               //and remove compiling the fortran code -- Zhihoong Ye, 05/30/2017
               /*Note: this needs the fortran PB code, not in used anymore{{{*/
-              //gCal_F1F2(kTarget->A,kTarget->Z,Qsq,Wsq,F); 
-              //W->First = F->First/P_MASS;
-              //W->Second = F->Second/nu;
-              //Double_t sig_mott = pow((19732.0/(2.0*137.0388*E0_cc*SN_SQ)),2)*pow(CS_SQ,1)/1e6;
-              //sig_dis = sig_mott*(W->Second+2.0*W->First*pow(TN_Theta,2));
+              Double_t CS_Theta = cos(kTheta/2.0);
+              Double_t SN_Theta = sin(kTheta/2.0);
+              Double_t TN_Theta = tan(kTheta/2.0);
+              Double_t SN_SQ = SN_Theta*SN_Theta;
+              Double_t CS_SQ = CS_Theta*CS_Theta;
+
+              Double_t  Qsq = 4.0*E0_cc*Ep_cc*SN_SQ;
+              Double_t nu = E0_cc - Ep_cc;
+              Double_t Wsq = -Qsq + P_MASS*P_MASS + 2.0*P_MASS*nu;
+              Double_t xbj = Qsq/2.0/P_MASS/nu;
+
+              gCal_F1F2(kTarget->A,kTarget->Z,Qsq,Wsq,F); 
+              W->First = F->First/P_MASS;
+              W->Second = F->Second/nu;
+              Double_t sig_mott = pow((19732.0/(2.0*137.0388*E0_cc*SN_SQ)),2)*pow(CS_SQ,1)/1e6;
+              sig_dis = sig_mott*(W->Second+2.0*W->First*pow(TN_Theta,2));
+              //double sig_dis_temp= sig_dis;
               /*}}}*/
-              
+
               //Using F2ALLM97 model:--Z. Ye 05/30/2017
-              DIS *dis = new DIS();
-              dis->SetKin(kE0, kEp, kTheta);//GeV,GeV/c, Radius
-              Double_t Sigma_DIS = dis->Sigma(kTarget->A, kTarget->Z);//nbarn/sr/GeV
-              sig_dis = Sigma_DIS/1000.0; //nb/sr/MeV
+              //dis->SetKin(E0_cc, Ep_cc, kTheta);//GeV,GeV/c, Radius
+              //Double_t Sigma_DIS = dis->Sigma(kTarget->A, kTarget->Z);//nbarn/sr/GeV
+              //sig_dis = Sigma_DIS/1000.0; //nb/sr/MeV
+
+              //cout<<"x = "<<xbj<<" DIS_PB / DIS_AM = "<<sig_dis_temp/sig_dis<<endl;
+              /*cout<<"x = "<<xbj<<" DIS_AM / DIS_PB = "<<sig_dis/sig_dis_temp<<endl;*/
 
               /*Christy&Bosted's DIS model, Need christy_bosted_inelastic.h{{{*/ //--Z. Ye 05/30/2017
               //double xs_p = sigma_p(kE0, kTheta, kEp);//Peter Bosted's DIS model
@@ -203,14 +219,14 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
               if(sig_dis<0.0||isnan(sig_dis)||isinf(sig_dis))
                   sig_dis = 0.0;
 
-              delete dis;
           }
 
 	  sig_dis *= FF1*FF1;
   }// if(kFlag==1 || kFlag ==3 || kFlag==4 || kFlag==5){
 
   delete F; delete W;
-    
+  //delete dis;
+
   sig->Factor = Sig_QE->Factor;
   sig->QE = Sig_QE->Value;
   sig->DIS = sig_dis;
