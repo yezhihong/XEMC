@@ -609,35 +609,35 @@ inline void gCal_F1F2(const int kA, const int kZ, const double kQsq, const doubl
   return;
 }/*}}}*/
 
-//inline void gCal_QEF1F2(const int kA, const int kZ, const double kQsq, const double kWsq,XEM_VAR2* f1f2)[>{{{<]
-//{
-//[>
-////--------------------------------------------------------------------
-//// This is the updated version of F1F2 subroutine. For more info:
-////    http://arxiv.org/abs/1203.2262
-//// Original Code locates at:
-////    https:/userweb.jlab.org/~bosted/fits.html
-////
-//// Directly call the FORTRAN subroutine instead of converting into C++
-////
-////    --- Zhihong Ye, 12/03/2012
-////--------------------------------------------------------------------
-//*/
+inline void gCal_QEF1F2(const int kA, const int kZ, const double kQsq, const double kWsq,XEM_VAR2* f1f2)/*{{{*/
+{
+/*
+//--------------------------------------------------------------------
+// This is the updated version of F1F2 subroutine. For more info:
+//    http://arxiv.org/abs/1203.2262
+// Original Code locates at:
+//    https:/userweb.jlab.org/~bosted/fits.html
+//
+// Directly call the FORTRAN subroutine instead of converting into C++
+//
+//    --- Zhihong Ye, 12/03/2012
+//--------------------------------------------------------------------
+*/
 
-  //f1f2->First=0.0;
-  //f1f2->Second=0.0;
+  f1f2->First=0.0;
+  f1f2->Second=0.0;
 
-  ////=======================================
-  //// Updated F1F2 in Fortran Subroutines
-  ////=======================================
-  //double kF1 = -1.1, kF2 = -1.2;
-  //double dZ = (double) (kZ); double dA = (double) (kA);
-  //f1f2qe09_(&dZ, &dA, &kQsq, &kWsq, &kF1, &kF2);
+  //=======================================
+  // Updated F1F2 in Fortran Subroutines
+  //=======================================
+  double kF1 = -1.1, kF2 = -1.2;
+  double dZ = (double) (kZ); double dA = (double) (kA);
+  f1f2qe09_(&dZ, &dA, &kQsq, &kWsq, &kF1, &kF2);
 
-  //f1f2->First = kF1;
-  //f1f2->Second = kF2;
-  //return;
-//}[>}}}<]
+  f1f2->First = kF1;
+  f1f2->Second = kF2;
+  return;
+}/*}}}*/
 
 inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f2)/*{{{*/
 {

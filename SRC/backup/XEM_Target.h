@@ -93,7 +93,7 @@ class XEM_TGT
     if(Exist)
       cerr <<endl<< "@@@@@@ I have found your target from the table!" <<endl;
     else{
-      cerr << Form("****** ERROR, your target is not in the table (%s)! Check the following table:", kName.Data()) <<endl;
+      cerr << "****** ERROR, your target is not in the table! Check the following table:" <<endl;
       List();
     }
     //Be careful -- the following variables needed to be converted:
@@ -137,7 +137,7 @@ class XEM_TGT
     if(!(Exist)){
       //     cerr <<endl<< "@@@@@@ I have found your target from the table!" <<endl;
       //  else{
-      cerr << Form("****** ERROR, your target is not in the table (A=%d, Z=%d)! Check the following table:", kA, kZ) <<endl;
+      cerr << "****** ERROR, your target is not in the table! Check the following table:" <<endl;
       List();
     }
     //Be careful -- the following variables needed to be converted:

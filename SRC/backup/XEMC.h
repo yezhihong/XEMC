@@ -102,7 +102,7 @@ class XEMC
 			//Add Target
 			Target_Name=inputdata[k++].c_str();
 			Target_Z=atoi(inputdata[k++].c_str());
-			Target_A=atof(inputdata[k++].c_str()); 
+			Target_A=atof(inputdata[k++].c_str());
 			Target_T=atof(inputdata[k++].c_str());
 			Target_rho=atof(inputdata[k++].c_str());
 			z0=atof(inputdata[k++].c_str());

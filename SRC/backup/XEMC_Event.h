@@ -52,8 +52,7 @@ class XEMCEvent
 		void Init()
 		{
             XEMC_Target=new XEM_TGT();
-            //XEMC_Target->GetValueAZ(Target.A,Target.Z);
-            XEMC_Target->GetValue(Target.Name.c_str());
+            XEMC_Target->GetValueAZ(Target.A,Target.Z);
 		};
 		/*}}}*/
 

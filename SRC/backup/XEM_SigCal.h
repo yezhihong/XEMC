@@ -105,6 +105,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   }//if(kFlag==1 || kFlag ==2)
      
   sig_dis =0.0;
+  // DIS *dis = new DIS();
   if(kFlag==1 || kFlag ==3 || kFlag==4|| kFlag ==5){
 
       /*OLD DIS FIT{{{*/
@@ -198,13 +199,12 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
               /*}}}*/
 
               //Using F2ALLM97 model:--Z. Ye 05/30/2017
-              /* DIS *dis = new DIS();*/
               //dis->SetKin(E0_cc, Ep_cc, kTheta);//GeV,GeV/c, Radius
               //Double_t Sigma_DIS = dis->Sigma(kTarget->A, kTarget->Z);//nbarn/sr/GeV
               //sig_dis = Sigma_DIS/1000.0; //nb/sr/MeV
-              /*delete dis;*/
 
-              //cout<<"x = "<<xbj<<" DIS_AM / DIS_PB = "<<sig_dis/sig_dis_temp<<endl;
+              //cout<<"x = "<<xbj<<" DIS_PB / DIS_AM = "<<sig_dis_temp/sig_dis<<endl;
+              /*cout<<"x = "<<xbj<<" DIS_AM / DIS_PB = "<<sig_dis/sig_dis_temp<<endl;*/
 
               /*Christy&Bosted's DIS model, Need christy_bosted_inelastic.h{{{*/ //--Z. Ye 05/30/2017
               //double xs_p = sigma_p(kE0, kTheta, kEp);//Peter Bosted's DIS model
@@ -225,6 +225,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   }// if(kFlag==1 || kFlag ==3 || kFlag==4 || kFlag==5){
 
   delete F; delete W;
+  //delete dis;
 
   sig->Factor = Sig_QE->Factor;
   sig->QE = Sig_QE->Value;
