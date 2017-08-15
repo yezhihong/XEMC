@@ -181,6 +181,7 @@ class XEM_TGT
   }; 
   
   void List(){
+      cout<<Form("&&&& From the target table: %s", TARGET_TABLE.Data())<<endl;
     ifstream table(TARGET_TABLE.Data());
     TString content; 
     cerr <<endl<< "~~~~~~~~~~~~~~~~~ Target Table ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
