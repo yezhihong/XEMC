@@ -26,21 +26,21 @@
 ############Target
 He3            #Name
 2              #Z: Atomic Number
-3.0160293      #A: Atomic Weight(g/mol)
-0.65626        #T target thickness(g/cm^2)
-0.032810       #target density(g/cm^3)
+3              #A: Atomic Weight(g/mol)
+0.54867        #T target thickness(g/cm^2) 
+0.027433       #target density(g/cm^3) #With Boiling Effect at 120uA
 0.000000       #z0 target center(cm)
 20.00000       #T_L target length(cm)
 2.000000       #T_H target height(cm)
 Entrance       #Name for target cell
 13             #Z_i of initial window ( no zero )
 26.982         #A_i of initial window (g/mol) ( no zero )
-0.0741         #T_i target thickness of initial window(g/cm^2)
+0.0736         #T_i target thickness of initial window(g/cm^2)
 2.700          #density of initial window(g/cm^3)
 Exit           #Name for target cell
 13             #Z_f of initial window ( no zero )
 26.982         #A_f of initial window (g/mol) ( no zero )
-0.0953         #T_f target thickness of initial window(g/cm^2)
+0.0887         #T_f target thickness of initial window(g/cm^2)
 2.700          #density of final window(g/cm^3)
 0.0            #T_Theta target angle(deg) angle between beam and target(top view)
 0              #IsBump

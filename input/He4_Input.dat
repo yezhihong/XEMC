@@ -1,11 +1,11 @@
 #############Debug Flags
 0              #IsDebug (default=false)
-1              #Enable energy loss (default=false)
+0              #Enable energy loss (default=false)
 119.25         #HRS Length (HRS_L or HRS_R)  (cm)
 0.0            #D_x X offset(cm in TCS) between TCS and HCS
 0.0            #D_y Y offset(cm in TCS) between TCS and HCS
 -0.2668        #Beam X Center (cm), -0.02668 for x>2
-0.3022         #Beam Y Center (cm), 0.03022 for x>2
+0.30220        #Beam Y Center (cm), 0.03022 for x>2
 0              #Enable QFS cross section model to replace XEMC, default=false
 0              #Enable Q2dep when Calculating Q.E. Peak  (QFS model, default=false, not used in XEMC)
 160.00000      #Fermi_Moment,fermi momentum of target(MeV) (QFS model,not used in XEMC)
@@ -26,21 +26,21 @@
 #############Target
 He4            #Name
 2              #Z: Atomic Number
-4.02602        #A: Atomic Weight(g/mol)
-0.6652         #T target thickness(g/cm^2)
-0.03326        #target density(g/cm^3)
+4              #A: Atomic Weight(g/mol)
+0.6292         #T target thickness(g/cm^2)
+0.03146        #target density(g/cm^3) #With Boiling Effect at 95uA
 0.000000       #z0 target center(cm)
 20.00000       #T_L target length(cm)
 2.000000       #T_H target height(cm)
 Entrance       #Name for target cell
 13             #Z_i of initial window ( no zero )
 26.982         #A_i of initial window (g/mol) ( no zero )
-0.0741         #T_i target thickness of initial window(g/cm^2)
+0.0736         #T_i target thickness of initial window(g/cm^2)
 2.700          #density of initial window(g/cm^3)
 Exit           #Name for target cell
 13             #Z_f of initial window ( no zero )
 26.982         #A_f of initial window (g/mol) ( no zero )
-0.0953         #T_f target thickness of initial window(g/cm^2)
+0.0887         #T_f target thickness of initial window(g/cm^2)
 2.700          #density of final window(g/cm^3)
 0.0            #T_Theta target angle(deg) angle between beam and target(top view)
 0              #IsBump
