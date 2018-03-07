@@ -41,6 +41,7 @@ int getargs(int argc, char**argv);
 int main(int argc,char** argv){
 
 	Double_t xbj=0.0, cs_qe=0.0, cs_dis=0.0, cs_rad=0.0,cs_born=0.0;
+    Double_t cs_dis_f2allm=0.0, cs_dis_f1f209=0.0;
 	TString Target;
 	int gerr = getargs(argc,argv);
 
@@ -60,52 +61,24 @@ int main(int argc,char** argv){
 	Double_t Q2 = 4.0 * E0 * Ep * pow(sin(Theta*3.1415926/180./2.0),2);
 	xbj = Q2/2.0/0.938272/(E0-Ep);
 
-	Int_t A=1; 
-	Int_t Z=0;
     //Basic input file, mostly important for radiated cross sections
 	TString Target_Input = Form("./input/%s_Input.dat",Target.Data());	
 
-	/*Set Target{{{*/
-	if(Target == "H2") {
-		A = 2; Z = 1;}
-	else if(Target == "H3") {
-		A = 3; Z = 1;}
-    else if(Target == "He3") {
-        A = 3; Z = 2;}
-	else if(Target == "He4") {
-		A = 4; Z = 2;}
-	else if(Target == "C12") { 
-		A = 12; Z = 6;}
-	else if(Target == "Al") { 
-		A = 27; Z = 13;}
-	else if(Target == "Ca40") {
-		A = 40; Z = 20;}
-	else if(Target == "Ca48") {
-		A = 48; Z = 20;}
-	else if(Target == "Dummy") { 
-		A = 27; Z = 13;}
-	else{
-		cerr<<"I don't understand the Target!"<<endl;}
-	/*}}}*/
-
 	//Define a event to calculate radiated cross section
 	XEMC* Event = new XEMC(); 
-<<<<<<< HEAD
 	Event->Init(Target_Input.Data());
-    //Event->SetTargetTable("./target.table");
     Event->SetTargetTable("/work/halla/e08014/disk1/yez/XEMC/target.table");
-=======
-    Event->SetTargetTable("./target.table");
-	Event->Init(Target_Input.Data());
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 	Int_t err = -1;
+     Event->DebugPrint();
 
 	err = Event->Process(E0,Ep,Theta);	
 	if(err>=0){
 		cs_qe = Event->XS_QE();
-		cs_dis = Event->XS_DIS();
-		cs_rad = Event->XS_Rad();
+		cs_dis = Event->XS_DIS();//default
+		cs_dis_f2allm = Event->XS_DIS(4);//4->F2ALLM
+		cs_dis_f1f209 = Event->XS_DIS(5);//5->F1F209;
 		cs_born = Event->XS_Born();
+		cs_rad = Event->XS_Rad();
 	}else{
          cerr<<"*** ERROR, Something wrong with the XS calculation!!!"<<endl;
         
@@ -115,7 +88,7 @@ int main(int argc,char** argv){
 	cerr <<"------------------------------------------------------------------------"<<endl;
 	cerr << Form("For Ep=%f, Theta=%f, xbj=%f, Q2=%f", Ep, Theta, xbj, Q2)<<endl;
 	cerr <<"------------------------------------------------------------------------"<<endl;
-	cerr << Form("@@@ XS_QE = %e, XS_DIS = %e, XS_Born = %e, XS_Rad = %e", cs_qe, cs_dis, cs_born,cs_rad)<<endl;
+	cerr << Form("@@@ XS_QE = %e, XS_DIS = %e(%e), XS_Born = %e, XS_Rad = %e", cs_qe, cs_dis_f2allm,cs_dis_f1f209, cs_born,cs_rad)<<endl;
 	cerr <<"------------------------------------------------------------------------"<<endl;
 	cerr <<"------------------------------------------------------------------------"<<endl;
 	return 0;

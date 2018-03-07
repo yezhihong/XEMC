@@ -7,25 +7,25 @@ PROGRAM = Check_XS
 CFLAGS = $(shell $(ROOTSYS)/bin/root-config --cflags)
 LIBS   = $(shell $(ROOTSYS)/bin/root-config --libs)
 GLIBS  = $(shell $(ROOTSYS)/bin/root-config --glibs)
-XEMCDIR = /work/halla/e08014/disk1/yez/XEMC/SRC
+XEM_DIR = ./SRC
 
 CFLAGS += -Wall -g
-INCLUDE := -I${ROOTSYS}/include -I$(XEMCDIR)
+INCLUDE := -I${ROOTSYS}/include -I$(XEM_DIR)
 RTLIBS := -L${ROOTSYS}/lib -lCore -lgfortran # /usr/lib/libg2c.so.0 #use /usr/lib64/ for ifarm
 all: $(PROGRAM)
 
 GFORTRAN := gfortran
 FFLAGS = -C -g -m64 -fbounds-check -finit-local-zero -fno-automatic # use -m64 on ifarm, which is a 64bit system
 
-${XEMCDIR}/F1F209.o: ${XEMCDIR}/F1F209.f 
+${XEM_DIR}/F1F209.o: ${XEM_DIR}/F1F209.f 
 	rm -f $@
-	cd ${XEMCDIR} ; $(GFORTRAN) $(FFLAGS) -c F1F209.f;
+	cd ${XEM_DIR} ; $(GFORTRAN) $(FFLAGS) -c F1F209.f;
 
 #$(PROGRAM): $(PROGRAM).o
 	#g++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS)
 
-$(PROGRAM): $(PROGRAM).o $(XEMCDIR)/F1F209.o
-	g++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) $(XEMCDIR)/F1F209.o 
+$(PROGRAM): $(PROGRAM).o $(XEM_DIR)/F1F209.o
+	g++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) $(XEM_DIR)/F1F209.o 
 
 #$(PROGRAM): $(PROGRAM).o F1F209.o
 	#g++ -o $(PROGRAM) $(PROGRAM).o $(CFLAGS) $(LIBS) $(RTLIBS) F1F209.o 

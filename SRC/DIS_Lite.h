@@ -1,12 +1,12 @@
 //A Lite verion w/o the CJ model
-#ifndef DIS_Lite_H
+#ifndef DIS_H
 static const double GeV2_to_nbarn= 0.3894*1e6; //GeV^-2-->nbarn
 
-class DIS_Lite{
+class DIS{
     public:
-        DIS_Lite(){
+        DIS(){
         }
-        virtual ~DIS_Lite(){
+        virtual ~DIS(){
             //	delete fRan;
         }
     public:
@@ -14,11 +14,11 @@ class DIS_Lite{
             printf("***************************************************************\n");
             printf("**  Change kinematic setting by running SetKin(E0*GeV, Ep*GeV, Theta*Rad)\n");
             printf("** \n");
-            printf("**  Call:  DIS_Lite->GetF1(Nucleon),like Proton, Neutron, Deutron\n");
-            printf("**      or DIS_Lite->GetF2(Nucleon),like Proton, Neutron, Deutron\n");
+            printf("**  Call:  DIS->GetF1(Nucleon),like Proton, Neutron, Deutron\n");
+            printf("**      or DIS->GetF2(Nucleon),like Proton, Neutron, Deutron\n");
             printf("** \n");
-            printf("**  Call:  DIS_Lite->Sigma(Nucleon),like Proton, Neutron, Deutron\n");
-            printf("**      or DIS_Lite->Sigma(A, Z)\n");
+            printf("**  Call:  DIS->Sigma(Nucleon),like Proton, Neutron, Deutron\n");
+            printf("**      or DIS->Sigma(A, Z)\n");
             printf("***************************************************************\n");
         }/*}}}*/
 

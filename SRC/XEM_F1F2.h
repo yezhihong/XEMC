@@ -4,87 +4,14 @@ extern "C"
  void f1f2in09_(const double*,const double*, const double*, const double*, double*, double*, double*);
 
 }
-
-<<<<<<< HEAD
-inline void gGet_Christy806(double aQsq, double aWsq, XEM_VAR4 *sig);
 inline Double_t gGet_Resmod316(double aQsq, double aWsq, int aflag);
+inline void gGet_Christy806(double aQsq, double aWsq, XEM_VAR4 *sig);
+inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval);
 inline void gGet_Pind(double aQsq, double aWsq, XEM_VAR4* sig);
 inline Double_t gGet_Resd(double aQsq, double aWsq,double *aXval);
-inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval);
-inline Double_t gGet_NMC(double aXbj, double aQsq);
+inline void gCal_F1F2(const int kA, const int kZ, const double kQsq, const double kWsq,XEM_VAR3* f1f2);
 inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f2);
 
-inline void gCal_F1F2(const int kA, const int kZ, const double kQsq, const double kWsq,XEM_VAR3* f1f2)/*{{{*/
-{
-/*
-//--------------------------------------------------------------------
-// This is the updated version of F1F2 subroutine. For more info:
-//    http://arxiv.org/abs/1203.2262
-// Original Code locates at:
-//    https:/userweb.jlab.org/~bosted/fits.html
-//
-// Directly call the FORTRAN subroutine instead of converting into C++
-//
-//    --- Zhihong Ye, 12/03/2012
-//--------------------------------------------------------------------
-*/
-
-  f1f2->First=0.0;
-  f1f2->Second=0.0;
-  f1f2->Third=0.0;
-
-// gCal_F1F2In06( kA, kZ, kQsq, kWsq, f1f2);
- 
-  //=======================================
-  // Updated F1F2 in Fortran Subroutines
-  //=======================================
-  double kF1 = -1.1, kF2 = -1.2, kRC = -1.3;
-  double dZ = (double) (kZ); double dA = (double) (kA);
-  f1f2in09_(&dZ, &dA, &kQsq, &kWsq, &kF1, &kF2, &kRC);
-// DEBUG -- For D2, Can not get F1 and F2 while Wsq < 0, Z. Ye, 12/05/2012
-	  if(kA==2 && kZ==1 && kWsq<-1e-33){
-		 kF1 = 0.0; kF2 = 0.0; kRC = 0.0;
-//	 cerr<<Form("++++ Z=%d, A=%d, Q2=%f, W2=%f, F1=%f, F2=%f, RC=%f", kZ, kA, kQsq, kWsq, kF1, kF2, kRC)<<endl;
-	  }
-
-  f1f2->First = kF1;
-  f1f2->Second = kF2;
-  f1f2->Third=kRC;
-  return;
-}/*}}}*/
-//////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////
-// Christy fit to proton
-//inline XEM_VAR4* gGet_Christy806(double aQsq, double aWsq)
-inline void gGet_Christy806(double aQsq, double aWsq, XEM_VAR4 *sig)/*{{{*/
-{
-  //  XEM_VAR4* sig = new XEM_VAR4();
-  Double_t aR=0.0,aF1=0.0,aFL=0.0,aNu=0.0,aSigL=0.0,aSigT=0.0,aW1p=0.0,aW2p=0.0;
-  if(aWsq > 1.155){
-    Double_t xb = aQsq/(aWsq+aQsq-PM_SQ);
-    if(xb>0.0){
-      aSigT = gGet_Resmod316(aQsq,aWsq,1);
-      aSigL = gGet_Resmod316(aQsq,aWsq,2);
-
-      aF1 = aSigT*(aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/ALPHA/(HC_SQ*GeVToMeV);
-      aFL = aSigL*2.0*xb*(aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/ALPHA/(HC_SQ*GeVToMeV);
-      aR = aFL/(2.0*xb*aF1);
-      //Why we need this?! FIX_HERE
-      aNu = aQsq/2.0/PROTON_MASS/xb;
-      aW1p = aF1/PROTON_MASS;
-      aW2p = aW1p/(1.0+aNu*aNu/aQsq)*(1.0+aR);
-    }
-  }
-  sig->First = aF1;
-  sig->Second = aR;
-  sig->Third = aSigL;
-  sig->Forth = aSigT;
-
-  return;
-}//inline XEM_VAR4* gGet_Christy806(double aQsq, double aWsq)
-/*}}}*/
-=======
 // NMC "bound" f2n/f2p 
 // ref: Nuc Phy B 371 (1992) 3
 inline Double_t gGet_NMC(double aXbj, double aQsq)/*{{{*/
@@ -103,7 +30,6 @@ inline Double_t gGet_NMC(double aXbj, double aQsq)/*{{{*/
   return f2nf2p;
 }//inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq)/*}}}*/
 
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 //////////////////////////////////////////////////////////////////////
 //  Version 031606  -  Author:  M.E. Christy                        //
 //  Fit form is empirical.  Please do not try to interpret physics  //
@@ -152,7 +78,7 @@ inline Double_t gGet_Resmod316(double aQsq, double aWsq, int aflag)/*{{{*/
   Double_t Q2=aQsq;// A new Q2 to replace Qsq if necessary
   Double_t dQ2 = 0.05;
   Double_t sig_res=0.0,sig_nr=0.0,sig_temp=0.0,sig=0.0,slope=0.0;
-  Double_t dIP,dIP2,xb,xpr,k,kcm,epicm,ppicm,ppi2cm,epi2cm,eetacm,petacm;
+  Double_t dIP,dIP2,xpr,k,kcm,epicm,ppicm,ppi2cm,epi2cm,eetacm,petacm;
   Double_t kr[7],kcmr[7],epicmr[7],ppicmr[7],ppi2cmr[7],epi2cmr[7],eetacmr[7],petacmr[7],pgam[7];
   Double_t sigr[7],aMass[7],aWidth[7],aIntWidth[7],height[7];
   Double_t pwid[2][7],rescoef[6][4],nr_coef[3][4];
@@ -167,7 +93,7 @@ inline Double_t gGet_Resmod316(double aQsq, double aWsq, int aflag)/*{{{*/
     //Dipole Parameterization
     dIP = 1.0/pow((1.0+Q2/0.71),2);
     dIP2 = dIP*dIP;
-    xb = Q2/(Q2+aWsq-PM_SQ);
+    //xb = Q2/(Q2+aWsq-PM_SQ);
     xpr = 1.0+(aWsq-(PROTON_MASS+PION_MASS)*(PROTON_MASS+PION_MASS))/(Q2+cXval[49]);
     xpr = 1.0/xpr;
     
@@ -312,81 +238,6 @@ inline Double_t gGet_Resmod316(double aQsq, double aWsq, int aflag)/*{{{*/
   }
   delete[]  cXval;
   return sig;
-<<<<<<< HEAD
-}//inline Double_t gGet_Resmod316(double aQsq, double aWsq, int aflag)
-/*}}}*/
-////////////////////////////////////////////////////////////////
-// Calculate proton with Fermi smearing of a deuteron 
-////////////////////////////////////////////////////////////////
-inline void gGet_Pind(double aQsq, double aWsq, XEM_VAR4* sig)/*{{{*/
-{
-  Double_t nu = (aWsq-PM_SQ+aQsq)/2.0/PROTON_MASS;
-  Double_t Qv = sqrt(nu*nu + aQsq);
-  XEM_VAR4* temp = new XEM_VAR4();
-    
-  Double_t W2p=-1000.0,sigl=-1000.0,siglp=-1000.0,sigt=-1000.0,sigtp=-1000.0;
-  Double_t R=-1000.0,Rp=-1000.0,F1=-1000.0,F1p=-1000.0;
-  Double_t pz=-1000.0;
-// Do fast 20 bins if above threshold
-  if(aWsq>1.16){
-    for(int ism=0;ism<20;ism++){  
-      // try with energy term zero. Fix sign of qv * pz
-      W2p = pow((D_MASS+nu-PROTON_MASS),2)-
-	Qv*Qv + 2.0*Qv*cAvpz[ism]-cAvp2[ism];
-      if(W2p>1.155){ 
-	gGet_Christy806(aQsq,W2p,temp);
-	F1p = temp->First; Rp = temp->Second;
-	siglp = temp->Third; sigtp = temp->Forth;
-	
-	sigt += sigtp*cFyd[ism]/10.;
-	sigl += siglp*cFyd[ism]/10.;
-	F1   += F1p*cFyd[ism]/10.;
-      }
-    }
-  }
-  else{
-    for(int ism=0;ism<200;ism++){  
-      pz = -1.0+0.01*(ism+0.5);
-      // Need avp2f term to get right behavior x>1// 
-      W2p = pow((D_MASS+nu-sqrt(PM_SQ + cAvp2f[ism])),2)
-	- Qv*Qv+2.0*Qv*pz-cAvp2f[ism];
-      if(W2p>1.155){
-	gGet_Christy806(aQsq,W2p,temp);
-	F1p = temp->First; Rp = temp->Second;
-	siglp = temp->Third; sigtp = temp->Forth;
-	sigt += sigtp*cFydf[ism]/100.;
-	sigl += siglp*cFydf[ism]/100.;
-	F1   += F1p*cFydf[ism]/100.;
-      }
-    }
-  }
-  
-  if(!(sigt==0.)) 
-    R = sigl / sigt;
-  
-  sig->First = F1;
-  sig->Second = R;
-  sig->Third = sigl;
-  sig->Forth = sigt;
-  
-  delete temp;
-  return;
-}//inline XEM_VAR4* gGet_Pind(double aQsq, double aWsq)
-      /*}}}*/
-////////////////////////////////////////////////////////////////
-// Calculate dueteron F1 by Fermi smearing of proton plus neutron 
-////////////////////////////////////////////////////////////////
-inline Double_t gGet_Resd(double aQsq, double aWsq,double *aXval)/*{{{*/
-{
-  double* cXval= new double[50];
-  for(int i=0;i<50;i++)
-    cXval[i] = aXval[i];
-  
-  Double_t nu = (aWsq - PM_SQ + aQsq)/2./PROTON_MASS;
-  Double_t Qv = sqrt(nu*nu + aQsq);
-  Double_t F1 = 0.0;
-  Double_t pz,W2p,xbj,sigp;
-=======
 }//inline Double_t gGet_Resmod316(double aQsq, double aWsq, int aflag)/*}}}*/
 
 
@@ -398,29 +249,22 @@ inline Double_t gGet_Resd(double aQsq, double aWsq,double *aXval)/*{{{*/
 inline void gGet_Christy806(double aQsq, double aWsq, XEM_VAR4 *sig)/*{{{*/
 {
   //  XEM_VAR4* sig = new XEM_VAR4();
-  Double_t aR=0.0,aF1=0.0,aFL=0.0,aNu=0.0,aSigL=0.0,aSigT=0.0,aW1p=0.0,aW2p=0.0;
+  Double_t aR=0.0,aF1=0.0,aFL=0.0,aSigL=0.0,aSigT=0.0;//,aW1p=0.0,aW2p=0.0;
   if(aWsq > 1.155){
     Double_t xb = aQsq/(aWsq+aQsq-PM_SQ);
     if(xb>0.0){
       aSigT = gGet_Resmod316(aQsq,aWsq,1);
       aSigL = gGet_Resmod316(aQsq,aWsq,2);
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 
       aF1 = aSigT*(aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/ALPHA/(HC_SQ*GeVToMeV);
       aFL = aSigL*2.0*xb*(aWsq-PM_SQ)/8.0/TMath::Pi()/TMath::Pi()/ALPHA/(HC_SQ*GeVToMeV);
       aR = aFL/(2.0*xb*aF1);
       //Why we need this?! FIX_HERE
-      aNu = aQsq/2.0/P_MASS/xb;
-      aW1p = aF1/P_MASS;
-      aW2p = aW1p/(1.0+aNu*aNu/aQsq)*(1.0+aR);
+      //double aNu = aQsq/2.0/PROTON_MASS/xb;
+      //aW1p = aF1/PROTON_MASS;
+      //aW2p = aW1p/(1.0+aNu*aNu/aQsq)*(1.0+aR);
     }
   }
-<<<<<<< HEAD
-  delete[] cXval;
-  return F1;
-}//inline Double_t gGet_Resd(double aQsq, double aWsq)
-/*}}}*/
-=======
   sig->First = aF1;
   sig->Second = aR;
   sig->Third = aSigL;
@@ -429,7 +273,6 @@ inline void gGet_Christy806(double aQsq, double aWsq, XEM_VAR4 *sig)/*{{{*/
   return;
 }//inline XEM_VAR4* gGet_Christy806(double aQsq, double aWsq)/*}}}*/
 
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 
 ////////////////////////////////////////////////////////////
 //
@@ -481,7 +324,7 @@ inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval)/*{{{*/
   aIntWidth[6] = cXval[47];
   
   // precalculate w-dependent quantites in 0.1 MeV bins
-  Double_t w,w2,wdiff,wr,k,kcm,epicm,ppicm,epi2cm,ppi2cm,eetacm,petacm,dIP,dIP2;
+  Double_t w,w2,wdiff,k,kcm,epicm,ppicm,epi2cm,ppi2cm,eetacm,petacm,dIP,dIP2;
   Double_t sig_res,sig_nr,xpr,F1,xb,nu;
   Double_t kr[7],kcmr[7],epicmr[7],ppicmr[7],epi2cmr[7],ppi2cmr[7],eetacmr[7],petacmr[7],pgam[7],width[7];
   Double_t height[7],sig_rsv[7];
@@ -499,7 +342,7 @@ inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval)/*{{{*/
     w = (iw+0.5)*MeVToGeV;
     w2 = w*w;
     wdiff = w-(PROTON_MASS+PION_MASS);
-    wr = wdiff/w;
+    //double wr = wdiff/w;
 
     // Calculate kinematics needed for threshold Relativistic B-W 
     k = (w2-PM_SQ)/2.0/PROTON_MASS;
@@ -641,14 +484,6 @@ inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval)/*{{{*/
   delete[] cXval;
   delete temp;
   return sig;
-<<<<<<< HEAD
-}//inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval)
-/*}}}*/
-
-// NMC "bound" f2n/f2p 
-// ref: Nuc Phy B 371 (1992) 3
-inline Double_t gGet_NMC(double aXbj, double aQsq)/*{{{*/
-=======
 }//inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq,double* aXval)/*}}}*/
 
 
@@ -656,24 +491,24 @@ inline Double_t gGet_NMC(double aXbj, double aQsq)/*{{{*/
 // Calculate proton with Fermi smearing of a deuteron 
 ////////////////////////////////////////////////////////////////
 inline void gGet_Pind(double aQsq, double aWsq, XEM_VAR4* sig)/*{{{*/
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 {
-  Double_t nu = (aWsq-PM_SQ+aQsq)/2.0/P_MASS;
+  Double_t nu = (aWsq-PM_SQ+aQsq)/2.0/PROTON_MASS;
   Double_t Qv = sqrt(nu*nu + aQsq);
   XEM_VAR4* temp = new XEM_VAR4();
     
   Double_t W2p=-1000.0,sigl=-1000.0,siglp=-1000.0,sigt=-1000.0,sigtp=-1000.0;
-  Double_t R=-1000.0,Rp=-1000.0,F1=-1000.0,F1p=-1000.0;
+  Double_t R=-1000.0,F1=-1000.0,F1p=-1000.0;//,Rp=-1000.0;
   Double_t pz=-1000.0;
 // Do fast 20 bins if above threshold
   if(aWsq>1.16){
     for(int ism=0;ism<20;ism++){  
       // try with energy term zero. Fix sign of qv * pz
-      W2p = pow((D_MASS+nu-P_MASS),2)-
+      W2p = pow((D_MASS+nu-PROTON_MASS),2)-
 	Qv*Qv + 2.0*Qv*cAvpz[ism]-cAvp2[ism];
       if(W2p>1.155){ 
 	gGet_Christy806(aQsq,W2p,temp);
-	F1p = temp->First; Rp = temp->Second;
+	F1p = temp->First; 
+    //Rp = temp->Second;
 	siglp = temp->Third; sigtp = temp->Forth;
 	
 	sigt += sigtp*cFyd[ism]/10.;
@@ -690,7 +525,8 @@ inline void gGet_Pind(double aQsq, double aWsq, XEM_VAR4* sig)/*{{{*/
 	- Qv*Qv+2.0*Qv*pz-cAvp2f[ism];
       if(W2p>1.155){
 	gGet_Christy806(aQsq,W2p,temp);
-	F1p = temp->First; Rp = temp->Second;
+	F1p = temp->First; 
+    //Rp = temp->Second;
 	siglp = temp->Third; sigtp = temp->Forth;
 	sigt += sigtp*cFydf[ism]/100.;
 	sigl += siglp*cFydf[ism]/100.;
@@ -720,10 +556,10 @@ inline Double_t gGet_Resd(double aQsq, double aWsq,double *aXval)/*{{{*/
   for(int i=0;i<50;i++)
     cXval[i] = aXval[i];
   
-  Double_t nu = (aWsq - PM_SQ + aQsq)/2./P_MASS;
+  Double_t nu = (aWsq - PM_SQ + aQsq)/2./PROTON_MASS;
   Double_t Qv = sqrt(nu*nu + aQsq);
   Double_t F1 = 0.0;
-  Double_t pz,W2p,xbj,sigp;
+  Double_t pz,W2p,sigp;//, xbj;
 
   // Do fast 20 bins if abvoe threshold
   for(int ism=0;ism<200;ism++){
@@ -731,7 +567,7 @@ inline Double_t gGet_Resd(double aQsq, double aWsq,double *aXval)/*{{{*/
     // Need avp2f term to get right behavior x>1//
     W2p = pow((D_MASS + nu - sqrt(PM_SQ + cAvp2f[ism])),2) 
       -Qv*Qv + 2.0*Qv*pz - cAvp2f[ism];
-    xbj = aQsq/(W2p+aQsq-PM_SQ);
+    //xbj = aQsq/(W2p+aQsq-PM_SQ);
     
     if(W2p>1.155){
       sigp = gGet_Resmod_Hack(aQsq,W2p,cXval); //sigp is really F1deut/2.0
@@ -836,12 +672,12 @@ inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f
     f1f2->Third=0.0;
     XEM_VAR4* temp = new XEM_VAR4();
 
-    Double_t  nu = (kWsq - PM_SQ + kQsq)/2.0/P_MASS;
+    Double_t  nu = (kWsq - PM_SQ + kQsq)/2.0/PROTON_MASS;
     Double_t Qv = sqrt(nu*nu + kQsq);
 
     Double_t Es,kf,pf,dW2DPF,dW2DES,Wsqp;
     Double_t Rc=0.,sigt=0.,sigl=0.,F1p=0.,F1d=0.,W1=0.0,W2=0.0;  
-    Double_t Rcp=0.,siglp=0.,sigtp=0.,F1pp=0.,F1dp=0.;
+    Double_t siglp=0.,sigtp=0.,F1pp=0.,F1dp=0.;//,Rcp=0.;
     Double_t kXval[50];
     for(int i=0;i<50;i++)
         kXval[i] = cXvald0[i];
@@ -859,7 +695,7 @@ inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f
             F1p = F1d * 2.0 - F1p;
         }
 
-        W1 = F1p/P_MASS ;
+        W1 = F1p/PROTON_MASS ;
         W2 = W1 * (1.0+ Rc)/(1.0 + nu*nu/kQsq);
     }// if(kA < 2){ 
 
@@ -873,7 +709,7 @@ inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f
         // get fit to F1 in deuteron, per nucleon
         F1d=gGet_Resd(kQsq, kWsq,kXval);
         // convert to W1 per deuteron
-        W1 = F1d/P_MASS*2.0;
+        W1 = F1d/PROTON_MASS*2.0;
         W2 = W1 * (1. + Rc) / (1.0 + nu*nu /kQsq);
     }//else if(kA == 2){
 
@@ -898,13 +734,13 @@ inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f
         pf = 0.5*kf; 
         // assume this is 2*pf*Qv
         dW2DPF = 2.0*Qv;
-        dW2DES = 2.0*(nu + P_MASS); 
+        dW2DES = 2.0*(nu + PROTON_MASS); 
         for(int ism=0; ism<15;ism++){
             Wsqp = kWsq + cXX[ism]*pf*dW2DPF-Es*dW2DES;
             if(Wsqp > 1.159){
                 gGet_Christy806(kQsq,Wsqp,temp);
                 F1pp = temp->First; 
-                Rcp = temp->Second;
+                //Rcp = temp->Second;
                 siglp = temp->Third; 
                 sigtp = temp->Forth;
 
@@ -920,7 +756,7 @@ inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f
         Rc = 0.;
         if(sigt > 0.){
             Rc = sigl / sigt;
-            W1 = (2.0*kZ*F1d+(kA-2.0*kZ)*(2.0*F1d-F1p))/P_MASS; 
+            W1 = (2.0*kZ*F1d+(kA-2.0*kZ)*(2.0*F1d-F1p))/PROTON_MASS; 
             W2 = W1*(1.0+Rc)/(1.0+nu*nu /kQsq); 
         }
     }// else if(kA>2){
@@ -929,7 +765,7 @@ inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f
         return;
     }
     delete temp;
-    f1f2->First = P_MASS*W1;
+    f1f2->First = PROTON_MASS*W1;
     f1f2->Second = nu*W2;
     f1f2->Third=Rc;
     return;
@@ -937,135 +773,3 @@ inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f
 /*}}}*/
 
 
-<<<<<<< HEAD
-  Double_t f2nf2p=pow((aQsq/20.),b_x);
-  f2nf2p *= a_x*(1.+(aXbj*aXbj/aQsq));
-  return f2nf2p;
-}//inline Double_t gGet_Resmod_Hack(double aQsq,double aWsq)
-/*}}}*/
-
-inline void gCal_F1F2In06(int kA, int kZ, double kQsq, double kWsq,XEM_VAR3* f1f2)/*{{{*/
-{
-/*
-//--------------------------------------------------------------------
-// Fit to inelastic cross sections for A(e,e')X
-// valid for all W<3 GeV and all Q2<10 GeV2
-// 
-// Inputs: Z, A (real*8) are Z and A of nucleus 
-//         (use Z=0., A=1. to get free neutron)
-//         Qsq (real*8) is 4-vector momentum transfer squared (positive in
-//                     chosen metric)
-//         Wsq (real*8) is invarinat mass squared of final state calculated
-//                     assuming electron scattered from a free proton
-//                 
-// outputs: F1, F2 (real*8) are structure functions per nucleus
-// Version of 10/20/2006 P. Bosted
-//--------------------------------------------------------------------
-*/
-
-  f1f2->First=0.0;
-  f1f2->Second=0.0;
-  f1f2->Third=0.0;
-  XEM_VAR4* temp = new XEM_VAR4();
-
-  Double_t  nu = (kWsq - PM_SQ + kQsq)/2.0/PROTON_MASS;
-  Double_t Qv = sqrt(nu*nu + kQsq);
-  
-  Double_t Es,kf,pf,dW2DPF,dW2DES,Wsqp;
-  Double_t Rc=0.,sigt=0.,sigl=0.,F1p=0.,F1d=0.,W1=0.0,W2=0.0;  
-  Double_t Rcp=0.,siglp=0.,sigtp=0.,F1pp=0.,F1dp=0.;
-  Double_t kXval[50];
-  for(int i=0;i<50;i++)
-    kXval[i] = cXvald0[i];
-
-  // Cross section for proton or neutron
-  if(kA < 2){ 
-    gGet_Christy806(kQsq,kWsq,temp);
-    F1p = temp->First;    Rc = temp->Second;
-    sigl = temp->Third;   sigt = temp->Forth;
-  
-    // If neutron, subtract proton from deuteron. 
-    // Factor of two to convert from per nucleon to per deuteron
-    if(kZ < 0.5){ 
-      F1d = gGet_Resmod_Hack(kQsq,kWsq,kXval);
-      F1p = F1d * 2.0 - F1p;
-    }
-      
-    W1 = F1p/PROTON_MASS ;
-    W2 = W1 * (1.0+ Rc)/(1.0 + nu*nu/kQsq);
-  }// if(kA < 2){ 
-  
-  //For deuteron
-  else if(kA == 2){
-    // get Fermi-smeared R from Erics proton fit
-    gGet_Pind(kQsq, kWsq,temp);
-    F1p = temp->First;    Rc = temp->Second;
-    sigl = temp->Third;   sigt = temp->Forth;
-  
-    // get fit to F1 in deuteron, per nucleon
-    F1d=gGet_Resd(kQsq, kWsq,kXval);
-      // convert to W1 per deuteron
-    W1 = F1d/PROTON_MASS*2.0;
-    W2 = W1 * (1. + Rc) / (1.0 + nu*nu /kQsq);
-  }//else if(kA == 2){
-  
-  //For nuclei
-  else if(kA>2){
-    sigt = 0.;    sigl = 0.;
-    F1d = 0.;     F1p = 0.;
-    // Modifed to use Superscaling from Sick, Donnelly, Maieron,
-    // nucl-th/0109032
-    if(kA==2){       kf=0.085;      Es=0.0022;    }
-    if(kA==3){       kf=0.180;      Es=0.010;     }
-    if(kA==4){       kf=0.200;      Es=0.015;     }
-    if(kA>4 ){       kf=0.165;      Es=0.015;     }    
-    if(kA>7 ){       kf=0.228;      Es=0.020;     } 
-    if(kA>16){       kf=0.230;      Es=0.025;     }
-    if(kA>25){       kf=0.236;      Es=0.018;     }
-    if(kA>38){       kf=0.241;      Es=0.028;     }
-    if(kA>55){       kf=0.241;      Es=0.023;     } 
-    if(kA>60){       kf=0.245;      Es=0.028;     }
-    
-    //adjust pf to give right width based on kf
-    pf = 0.5*kf; 
-    // assume this is 2*pf*Qv
-    dW2DPF = 2.0*Qv;
-    dW2DES = 2.0*(nu + PROTON_MASS); 
-    for(int ism=0; ism<15;ism++){
-      Wsqp = kWsq + cXX[ism]*pf*dW2DPF-Es*dW2DES;
-      if(Wsqp > 1.159){
-	gGet_Christy806(kQsq,Wsqp,temp);
-	F1pp = temp->First; 
-	Rcp = temp->Second;
-	siglp = temp->Third; 
-	sigtp = temp->Forth;
-
-   	F1dp = gGet_Resmod_Hack(kQsq,Wsqp,kXval);
-     	F1d = F1d + F1dp * cFy[ism];
-	F1p = F1p + F1pp * cFy[ism];
-	sigt = sigt + sigtp * cFy[ism];
-	sigl = sigl + siglp * cFy[ism];
-      }
-    }
-  
-
-    Rc = 0.;
-    if(sigt > 0.){
-      Rc = sigl / sigt;
-      W1 = (2.0*kZ*F1d+(kA-2.0*kZ)*(2.0*F1d-F1p))/PROTON_MASS; 
-      W2 = W1*(1.0+Rc)/(1.0+nu*nu /kQsq); 
-    }
-  }// else if(kA>2){
-  else{
-    cerr<<"****** ERROR, Wrong Target, Cannot calculate F1F2!"<<endl;
-    return;
-  }
-  delete temp;
-  f1f2->First = PROTON_MASS*W1;
-  f1f2->Second = nu*W2;
-  f1f2->Third=Rc;
-  return;
-  }
-/*}}}*/
-=======
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c

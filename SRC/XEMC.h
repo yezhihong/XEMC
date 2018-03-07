@@ -73,29 +73,6 @@ class XEMC
 				}
 				//else it's comment, skipped
 			}
-<<<<<<< HEAD
-			/*{{{ Intialize parameters and calculate Radiated Cross Section*/
-			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
-			Event->E_s=kE0;   //E0, in GeV
-			Event->E_p=kEp;   //Ep, in GeV
-			Event->theta=kTheta; //Theta, in Deg
-			Event->Target.A = kA;
-			Event->Target.Z = kZ;
-			//And re-add materials for Win_Before/After_Mag with new angle setting
-			for(unsigned int ii=0;ii<Win_Before_Mag_Name.size();ii++)
-				Event->AddOneMaterial(Event->Win_Before_Mag, Win_Before_Mag_X0[ii], Win_Before_Mag_rho[ii],Win_Before_Mag_L[ii],Win_Before_Mag_A[ii],Win_Before_Mag_Z[ii],Win_Before_Mag_Name[ii].c_str());
-			for(unsigned int jj=0;jj<Win_After_Mag_Name.size();jj++)
-				Event->AddOneMaterial(Event->Win_After_Mag, Win_After_Mag_X0[jj], Win_After_Mag_rho[jj],Win_After_Mag_L[jj],Win_After_Mag_A[jj],Win_After_Mag_Z[jj],Win_After_Mag_Name[jj].c_str());
-			Event->reactz_gen = 0 - z0; //For foil targets, assume the reaction points are alwayl at the center
-			err=Event->Run();
-			if ( err==-1 ){
-				cerr << "********** Don't not success to calculate XS!!!"<<endl;
-				xs_rad = -1111.00;
-				xs_dis = -1112.00;
-				xs_qe = -1113.00;
-				xs_born = -2222.00;
-				tail = -1000.00;
-=======
 			fclose(XEMCfile);
 			/*}}}*/
 
@@ -108,20 +85,13 @@ class XEMC
 			D_y=atof(inputdata[k++].c_str());
 			beam_x=atof(inputdata[k++].c_str());
 			beam_y=atof(inputdata[k++].c_str());
-			//QFS model, not used in XEMC
-			IsQFS=atoi(inputdata[k++].c_str());
-			IsQFS_Q2dep=atoi(inputdata[k++].c_str());
-			Fermi_Moment=atof(inputdata[k++].c_str());
-			NIE=atof(inputdata[k++].c_str());
-			DEL_SEP=atof(inputdata[k++].c_str());
-			Form_Factor_Id=atoi(inputdata[k++].c_str());
+			XEMCFLAG=atoi(inputdata[k++].c_str());
+			IsRadCor=atoi(inputdata[k++].c_str());
 			IsInternal_Bre=atoi(inputdata[k++].c_str());
 			IsAppro=atoi(inputdata[k++].c_str());
 			IsExternal_Bre=atoi(inputdata[k++].c_str());
 			IsMulti_Photon_Cor=atoi(inputdata[k++].c_str());
-			IsRadCor=atoi(inputdata[k++].c_str());
 			DeltaE=atof(inputdata[k++].c_str());
-			XEMCFLAG=atoi(inputdata[k++].c_str());
 			//Add Target
 			Target_Name=inputdata[k++].c_str();
 			Target_Z=atoi(inputdata[k++].c_str());
@@ -144,7 +114,6 @@ class XEMC
 			Win_f_T=atof(inputdata[k++].c_str());
 			Win_f_rho=atof(inputdata[k++].c_str());
 			Target_Theta=atof(inputdata[k++].c_str());
-			IsBump=atoi(inputdata[k++].c_str());
 
 			//Target Chamber and other material before HRS magnetics
 			j=k;
@@ -155,7 +124,6 @@ class XEMC
 				Win_Before_Mag_L.push_back(atof(inputdata[j++].c_str()));
 				Win_Before_Mag_rho.push_back(atof(inputdata[j++].c_str()));
 				Win_Before_Mag_X0.push_back(atof(inputdata[j++].c_str()));
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 			}
 			j++;
 			while ( atof(inputdata[j].c_str())>=0 ){
@@ -180,20 +148,13 @@ class XEMC
 			Event->z0 = z0;
 			Event->T_L = T_L;
 			Event->T_H = T_H;
-			//QFS model, not used for XEMC model
-			Event->IsQFS = IsQFS;
-			Event->IsQFS_Q2dep = IsQFS_Q2dep;
-			Event->Fermi_Moment = Fermi_Moment;
-			Event->NIE = NIE;
-			Event->DEL_SEP = DEL_SEP;
-			Event->Form_Factor_Id = Form_Factor_Id;
+			Event->XEMCFLAG = XEMCFLAG;
+			Event->IsRadCor = IsRadCor;
 			Event->IsInternal_Bre = IsInternal_Bre;
 			Event->IsAppro = IsAppro;
 			Event->IsExternal_Bre = IsExternal_Bre;
 			Event->IsMulti_Photon_Cor = IsMulti_Photon_Cor;
-			Event->IsRadCor = IsRadCor;
 			Event->DeltaE = DeltaE;
-			Event->XEMCFLAG = XEMCFLAG;
 			//Target
 			Event->Target.Name= Target_Name;
 			Event->Target.A= Target_A;
@@ -201,7 +162,6 @@ class XEMC
 			Event->Target.T= Target_T;
 			Event->Target.rho= Target_rho;
 			Event->Target.L=T_L;//in HCS
-			Event->IsBump = IsBump;
 			//Target Cells
 			Event->Win_i.Name= Win_i_Name;
 			Event->Win_i.Z= Win_i_Z;
@@ -238,22 +198,16 @@ class XEMC
 				return -1;
 			}
 			/*{{{ Intialize parameters and calculate Radiated Cross Section*/
-<<<<<<< HEAD
-			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
 			Event->E_s=kE0;   //E0, in GeV
 			Event->E_p=kEp;   //Ep, in GeV
-=======
-			Event->E_s=kE0*1000.;   //E0, in MeV
-			Event->E_p=kEp*1000.;   //Ep, in MeV
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 			Event->theta=kTheta; //Theta, in Deg
 
-            if(kRadC=="RadC On")
-                Event->IsRadCor = 1;
-            if(kRadC=="RadC Off")
-                Event->IsRadCor = 0;
-            else
-                Event->IsRadCor = IsRadCor;
+                        if(kRadC=="RadC On")
+                            Event->IsRadCor = 1;
+                        if(kRadC=="RadC Off")
+                            Event->IsRadCor = 0;
+                        else
+                            Event->IsRadCor = IsRadCor;
 
 
                         //And re-add materials for Win_Before/After_Mag with new angle setting
@@ -287,55 +241,6 @@ class XEMC
 		}
 		/*}}}*/
 
-<<<<<<< HEAD
-		/*int Process(const double kE0, const double kEp, const double kTheta, const int kA, const int kZ, const kRctPt){{{*/
-		int Process(const double kE0, const double kEp, const double kTheta, const int kA, const int kZ, const double kRctPt)
-		{ 
-			if(kE0>12.0||kEp>12.0){
-				cerr<<" *** Are you sure? E0 or Ep > 12GeV?!!! *** "<<endl;
-				return -1;
-			}
-			/*{{{ Intialize parameters and calculate Radiated Cross Section*/
-			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
-			Event->E_s=kE0;   //E0, in GeV
-			Event->E_p=kEp;   //Ep, in GeV
-			Event->theta=kTheta; //Theta, in Deg
-			Event->Target.A = kA;
-			Event->Target.Z = kZ;
-			//And re-add materials for Win_Before/After_Mag with new angle setting
-			for(unsigned int ii=0;ii<Win_Before_Mag_Name.size();ii++)
-				Event->AddOneMaterial(Event->Win_Before_Mag, Win_Before_Mag_X0[ii], Win_Before_Mag_rho[ii],Win_Before_Mag_L[ii],Win_Before_Mag_A[ii],Win_Before_Mag_Z[ii],Win_Before_Mag_Name[ii].c_str());
-			for(unsigned int jj=0;jj<Win_After_Mag_Name.size();jj++)
-				Event->AddOneMaterial(Event->Win_After_Mag, Win_After_Mag_X0[jj], Win_After_Mag_rho[jj],Win_After_Mag_L[jj],Win_After_Mag_A[jj],Win_After_Mag_Z[jj],Win_After_Mag_Name[jj].c_str());
-			Event->reactz_gen = kRctPt - z0; //For foil targets, assume the reaction points are alwayl at the center
-			err=Event->Run();
-			if ( err==-1 ){
-				cerr << "********** Don't not success to calculate XS!!!"<<endl;
-				xs_rad = -1111.00;
-				xs_born = -2222.00;
-				xs_dis = -1112.00;
-				xs_qe = -1113.00;
-				tail = -1000.00;
-			}
-			else{
-				xs_dis = Event->cs_dis;
-				xs_qe = Event->cs_qe;
-				xs_born = Event->cs_Born;
-				xs_rad = Event->cs_Final;
-				tail = Event->tail;
-			}
-			xs_mott = Event->cs_M;
-
-			if ( IsDebug && err==0 )
-				Event->Print();
-
-			/*Finished Radiated Cross Section Calculation}}}*/
-			return 0;
-		}
-		/*}}}*/
-
-=======
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 		/*int Process(const double kE0, const double kEp, const double kTheta){{{*/
 		int Process(const double kE0, const double kEp, const double kTheta)
 		{
@@ -344,14 +249,8 @@ class XEMC
 				cerr<<" *** Are you sure? E0 or Ep > 12GeV?!!! *** "<<endl;
 				return -1;
 			}
-<<<<<<< HEAD
-			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
 			Event->E_s=kE0;   //E0, in GeV
 			Event->E_p=kEp;   //Ep, in GeV
-=======
-			Event->E_s=kE0*1000.;   //E0, in MeV
-			Event->E_p=kEp*1000.;   //Ep, in MeV
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 			Event->theta=kTheta; //Theta, in Deg
 
 			//And re-add materials for Win_Before/After_Mag with new angle setting
@@ -395,14 +294,8 @@ class XEMC
 				cerr<<" *** Are you sure? E0 or Ep > 12GeV?!!! *** "<<endl;
 				return -1;
 			}
-<<<<<<< HEAD
-			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
 			Event->E_s=kE0;   //E0, in GeV
 			Event->E_p=kEp;   //Ep, in GeV
-=======
-			Event->E_s=kE0*1000.;   //E0, in MeV
-			Event->E_p=kEp*1000.;   //Ep, in MeV
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 			Event->theta=kTheta; //Theta, in Deg
             tail = Event->tail;
 
@@ -453,6 +346,9 @@ class XEMC
 		double XS_DIS(){
 			return xs_dis;
 		}
+        double XS_DIS(int kFlag){
+            return Event->GetXS(kFlag);
+		}
 		double XS_Mott(){
 			return xs_mott;
 		}
@@ -461,157 +357,6 @@ class XEMC
 		}
         /*}}}*/
 
-<<<<<<< HEAD
-		/*Init(){{{*/
-		void Init (const string kTarget_Input){
-
-			cerr <<"---> Initializing Target Parameters from "<<kTarget_Input<<" ..."<<endl;
-			int i,j,k;
-			vector<string> inputdata;
-			/*Read XEMCfile{{{*/
-			FILE* XEMCfile;
-			XEMCfile=fopen(kTarget_Input.c_str(),"r");
-			char buf[CHAR_LEN];
-			char data[CHAR_LEN];
-			while ( fgets(buf,CHAR_LEN,XEMCfile) )
-			{
-				i=0;
-				while ( buf[i]==' ' )
-				{
-					i++;
-				}
-				if ( buf[i]!='#' )
-				{
-					j=0;
-					while ( buf[i]!='#' && buf[i]!='\0' )
-					{
-						data[j]=buf[i];
-						i++; j++;
-					}
-					data[j]='\0';
-					while ( data[--j]==' ' || data[j]=='\t' )
-					{
-						//remove space or tab at the end of data
-						data[j]='\0';
-					}
-					inputdata.push_back(data);
-				}
-				//else it's comment, skipped
-			}
-			fclose(XEMCfile);
-			/*}}}*/
-
-			/*Set Global Value{{{*/
-			k=0;
-			IsDebug=atoi(inputdata[k++].c_str());
-			IsEnergyLoss=atoi(inputdata[k++].c_str());
-			HRS_L=atof(inputdata[k++].c_str());
-			D_x=atof(inputdata[k++].c_str());
-			D_y=atof(inputdata[k++].c_str());
-			beam_x=atof(inputdata[k++].c_str());
-			beam_y=atof(inputdata[k++].c_str());
-			XEMCFLAG=atoi(inputdata[k++].c_str());
-			IsRadCor=atoi(inputdata[k++].c_str());
-			IsInternal_Bre=atoi(inputdata[k++].c_str());
-			IsAppro=atoi(inputdata[k++].c_str());
-			IsExternal_Bre=atoi(inputdata[k++].c_str());
-			IsMulti_Photon_Cor=atoi(inputdata[k++].c_str());
-			DeltaE=atof(inputdata[k++].c_str());
-			//Add Target
-			Target_Name=inputdata[k++].c_str();
-			Target_Z=atoi(inputdata[k++].c_str());
-			Target_A=atof(inputdata[k++].c_str());
-			Target_T=atof(inputdata[k++].c_str());
-			Target_rho=atof(inputdata[k++].c_str());
-			z0=atof(inputdata[k++].c_str());
-			T_L=atof(inputdata[k++].c_str());
-			T_H=atof(inputdata[k++].c_str());
-			Target_L=T_L;//in HCS
-			//Add Target Cell
-			Win_i_Name=inputdata[k++].c_str();
-			Win_i_Z=atoi(inputdata[k++].c_str());
-			Win_i_A=atof(inputdata[k++].c_str());
-			Win_i_T=atof(inputdata[k++].c_str());
-			Win_i_rho=atof(inputdata[k++].c_str());
-			Win_f_Name=inputdata[k++].c_str();
-			Win_f_Z=atoi(inputdata[k++].c_str());
-			Win_f_A=atof(inputdata[k++].c_str());
-			Win_f_T=atof(inputdata[k++].c_str());
-			Win_f_rho=atof(inputdata[k++].c_str());
-			Target_Theta=atof(inputdata[k++].c_str());
-
-			//Target Chamber and other material before HRS magnetics
-			j=k;
-			while ( atof(inputdata[j].c_str())>=0 ){
-				Win_Before_Mag_Name.push_back(inputdata[j++].c_str());
-				Win_Before_Mag_Z.push_back(atoi(inputdata[j++].c_str()));
-				Win_Before_Mag_A.push_back(atof(inputdata[j++].c_str()));
-				Win_Before_Mag_L.push_back(atof(inputdata[j++].c_str()));
-				Win_Before_Mag_rho.push_back(atof(inputdata[j++].c_str()));
-				Win_Before_Mag_X0.push_back(atof(inputdata[j++].c_str()));
-			}
-			j++;
-			while ( atof(inputdata[j].c_str())>=0 ){
-				Win_After_Mag_Name.push_back(inputdata[j++].c_str());
-				Win_After_Mag_Z.push_back(atoi(inputdata[j++].c_str()));
-				Win_After_Mag_A.push_back(atof(inputdata[j++].c_str()));
-				Win_After_Mag_L.push_back(atof(inputdata[j++].c_str()));
-				Win_After_Mag_rho.push_back(atof(inputdata[j++].c_str()));
-				Win_After_Mag_X0.push_back(atof(inputdata[j++].c_str()));     
-			}
-
-			/*Initialize values in XEMCEvent class{{{*/
-			Event = new XEMCEvent();
-			//Flags
-			Event->IsDebug = IsDebug;
-			Event->IsEnergyLoss = IsEnergyLoss;
-			Event->HRS_L = HRS_L;
-			Event->D_x = D_x;
-			Event->D_y = D_y;
-			Event->beam_x = beam_x;
-			Event->beam_y = beam_y;
-			Event->z0 = z0;
-			Event->T_L = T_L;
-			Event->T_H = T_H;
-			Event->IsInternal_Bre = IsInternal_Bre;
-			Event->IsAppro = IsAppro;
-			Event->IsExternal_Bre = IsExternal_Bre;
-			Event->IsMulti_Photon_Cor = IsMulti_Photon_Cor;
-			Event->IsRadCor = IsRadCor;
-			Event->DeltaE = DeltaE;
-			Event->XEMCFLAG = XEMCFLAG;
-			//Target
-			Event->Target.Name= Target_Name;
-			Event->Target.A= Target_A;
-			Event->Target.Z= Target_Z;
-			Event->Target.T= Target_T;
-			Event->Target.rho= Target_rho;
-			Event->Target.L=T_L;//in HCS
-			//Target Cells
-			Event->Win_i.Name= Win_i_Name;
-			Event->Win_i.Z= Win_i_Z;
-			Event->Win_i.A= Win_i_A;
-			Event->Win_i.T= Win_i_T;
-			Event->Win_i.rho= Win_i_rho;
-			Event->Win_f.Name= Win_f_Name;
-			Event->Win_f.Z= Win_f_Z;
-			Event->Win_f.A= Win_f_A;
-			Event->Win_f.T= Win_f_T;
-			Event->Win_f.rho= Win_f_rho;
-			Event->T_theta= Target_Theta;
-			/*}}}*/
-
-			if ( IsDebug )
-				DebugPrint();
-
-			inputdata.clear();
-			cerr<<"---> Initialization done!"<<endl;
-		}
-		/*}}}*/
-		/*}}}*/
-
-=======
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
         void SetTargetTable(TString kTargetTable){/*{{{*/
              TARGET_TABLE = kTargetTable;       
              cout<<"---> Set the Target Table for Fy Func: "<<kTargetTable.Data()<<endl;
@@ -635,8 +380,7 @@ class XEMC
 		}
         /*}}}*/
 
-	//private:
-	public:
+    public:
 		/*DebugPrint(){{{*/
 		void DebugPrint()
 		{
@@ -653,13 +397,17 @@ class XEMC
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"z0",               10,z0,                       8,"cm",40,"(target center for Target Windows)");
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"T_L",              10,T_L,                      8,"cm",40,"(target length for Target Windowns)");
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"T_H",              10,T_H,                      8,"cm",40,"(target height for Target Windowns)");
-			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsRadC" ,          10,IsRadCor,                 8," ",40,"(enable raditive correction)");
-			printf("%-*s=%*.2f %-*s %-*s\n",15,"DeltaE" ,          10,DeltaE,                   8," ",40,"(for radiative correction");
 			printf("%-*s=%*.1d %-*s %-*s\n",15,"XEMCFLAG" ,        10,XEMCFLAG,                 8," ",40,"(for XEMC model, 1->QE+DIS,2->QE only, 3->DIS only)");
+			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsRadC" ,          10,IsRadCor,                 8," ",40,"(enable raditive correction)");
+			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsInternal_Bre" ,  10,IsInternal_Bre,           8," ",40,"(for radiative correction)");
+			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsAppro",          10,IsAppro,                  8," ",40,"(for radiative correction)");
+			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsExternal_Bre",   10,IsExternal_Bre,           8," ",40,"(for radiative correction)");
+			printf("%-*s=%*.1d %-*s %-*s\n",15,"Multi_Photon_Cor", 10,IsMulti_Photon_Cor,       8," ",40,"(for radiative correction)");
+			printf("%-*s=%*.5f %-*s %-*s\n",15,"DeltaE" ,          10,DeltaE,                   8," ",40,"(for radiative correction)");
 
 			//    printf("%-*s=%*.*s %-*s %-*s\n",15,"Target Name" ,       10,Target_Name,                   8," ",40,"");
 			printf("%-*s=%*.2d %-*s %-*s\n",15,"Target Z" ,          10,Target_Z,               8," ",40,"");
-			printf("%-*s=%*.2f %-*s %-*s\n",15,"Target A" ,          10,Target_A,               8," ",40,"");
+			printf("%-*s=%*.2d %-*s %-*s\n",15,"Target A" ,          10,int(Target_A),               8," ",40,"");
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"Target T" ,          10,Target_T,               8," ",40,"");
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"Target rho" ,        10,Target_rho,             8," ",40,"");
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"Target L" ,          10,Target_L,               8," ",40,"");
@@ -682,8 +430,8 @@ class XEMC
 		//some of them maybe define in other place, so make sure they have the same units.
 		static const int CHAR_LEN=1024;
 		//default unit
-		//MeV cm g rad
-		//cross section output unit = nbarn/sr/MeV
+		//GeV cm g rad
+		//cross section output unit = nbarn/sr/GeV
 
 		int err;
 		XEMCEvent* Event;
@@ -706,6 +454,7 @@ class XEMC
         /*}}}*/
 
 		/*Only for Tail{{{*/
+		int Form_Factor_Id; //which form factor used
 		bool  IsInternal_Bre; //enable/disable internal bremsstrahlung
 		bool  IsExternal_Bre; //enable/disable external bremsstrahlung
 		bool  IsMulti_Photon_Cor; //enable/disable multiple photon correction

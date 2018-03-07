@@ -1,4 +1,4 @@
-inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget, XEM_SIG* fy2sig)/*{{{*/
+inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget, XEM_SIG* fy2sig)
 {
   /*Info{{{*/
   /*
@@ -134,10 +134,10 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
   fy2sig->Value = sig_out;
   fy2sig->Factor = fact;
   return;
- }/*}}}*/
+ }
 
 //Calculate Y-Scaling variable
-inline Double_t gGet_Y(double vE0, double vEp, double vTheta, XEM_TGT* vTarget)/*{{{*/
+inline Double_t gGet_Y(double vE0, double vEp, double vTheta, XEM_TGT* vTarget)
 {
   Double_t nu = vE0 - vEp;
   Double_t SN_Theta = sin(vTheta/2.0);
@@ -166,9 +166,9 @@ inline Double_t gGet_Y(double vE0, double vEp, double vTheta, XEM_TGT* vTarget)/
     y_cal = -(coeff_b+sqrt(root2))/(2.0*coeff_a);
 
   return y_cal;    
-}/*}}}*/
+}
 
-inline Double_t gGet_Fy(double vY, XEM_TGT* vTarget)/*{{{*/
+inline Double_t gGet_Fy(double vY, XEM_TGT* vTarget)
 {
   Double_t fy,y,f0,B,alpha,a,b;
   y=1000.0*vY;
@@ -186,9 +186,9 @@ inline Double_t gGet_Fy(double vY, XEM_TGT* vTarget)/*{{{*/
   fy*=1000.0;
  
   return fy;
-}/*}}}*/
+}
 
-inline Double_t gGet_He3_Fy( double vY, XEM_TGT* vTarget){/*{{{*/
+inline Double_t gGet_He3_Fy( double vY, XEM_TGT* vTarget){
   //This is a special function for He3 only to prevent the He3 Fy falls to zero quickly when x->3
   // -- Z. Ye, 05/19/2014
   Double_t fy,y,f0,B,alpha,a,b;
@@ -207,9 +207,9 @@ inline Double_t gGet_He3_Fy( double vY, XEM_TGT* vTarget){/*{{{*/
   fy = 1000.0*(f0-B)*alpha*alpha*exp(-(a*y)*(a*y))/(alpha*alpha+y*y)+B*exp(-(b*y)*(b*y));
 
   return fy;
-}/*}}}*/
+}
 
-inline void gGet_Sig_Bar_DF(double vE0,double vEp,double vTheta, double vY,double vPt,XEM_VAR2* sig_pn)/*{{{*/
+inline void gGet_Sig_Bar_DF(double vE0,double vEp,double vTheta, double vY,double vPt,XEM_VAR2* sig_pn)
 {
   Double_t CS_Theta = cos(vTheta/2.0);
   Double_t SN_Theta = sin(vTheta/2.0);
@@ -262,9 +262,9 @@ inline void gGet_Sig_Bar_DF(double vE0,double vEp,double vTheta, double vY,doubl
   sig_pn->First = sig_p;
   sig_pn->Second = sig_n;
   return;
-}/*}}}*/
+}
 
-inline void gGet_FF(int vFlag, double vQsq, double* vFF)/*{{{*/
+inline void gGet_FF(int vFlag, double vQsq, double* vFF)
 {
 
 /* Converted from nform_xem.f
@@ -518,9 +518,9 @@ C  ------------------------------------------------------------
   vFF[3] = GMN;
   return;
 }//inline void gGet_FF(double vFlag, double vQsq, double* vFF)
-/*}}}*/
 
-inline Double_t gGet_Tail_Corr(Int_t kA,Double_t kX)/*{{{*/
+
+inline Double_t gGet_Tail_Corr(Int_t kA,Double_t kX)
 {
    Double_t aa=1.;
    Double_t bb=0.;
@@ -586,4 +586,4 @@ inline Double_t gGet_Tail_Corr(Int_t kA,Double_t kX)/*{{{*/
 
      return tail_cor;
 }//inline Double_t gGet_Tail_Corr(Int_t kA,Double_t kX)
-/*}}}*/
+
