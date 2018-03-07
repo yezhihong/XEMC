@@ -46,8 +46,8 @@ class XEMC
 			}
 			/*{{{ Intialize parameters and calculate Radiated Cross Section*/
 			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
-			Event->E_s=kE0*1000.;   //E0, in MeV
-			Event->E_p=kEp*1000.;   //Ep, in MeV
+			Event->E_s=kE0;   //E0, in GeV
+			Event->E_p=kEp;   //Ep, in GeV
 			Event->theta=kTheta; //Theta, in Deg
 			Event->Target.A = kA;
 			Event->Target.Z = kZ;
@@ -91,18 +91,18 @@ class XEMC
 			}
 			/*{{{ Intialize parameters and calculate Radiated Cross Section*/
 			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
-			Event->E_s=kE0*1000.;   //E0, in MeV
-			Event->E_p=kEp*1000.;   //Ep, in MeV
+			Event->E_s=kE0;   //E0, in GeV
+			Event->E_p=kEp;   //Ep, in GeV
 			Event->theta=kTheta; //Theta, in Deg
 			Event->Target.A = kA;
 			Event->Target.Z = kZ;
 
-                        if(kRadC=="RadC On")
-                            Event->IsRadCor = 1;
-                        if(kRadC=="RadC Off")
-                            Event->IsRadCor = 0;
-                        else
-                            Event->IsRadCor = IsRadCor;
+            if(kRadC=="RadC On")
+                Event->IsRadCor = 1;
+            if(kRadC=="RadC Off")
+                Event->IsRadCor = 0;
+            else
+                Event->IsRadCor = IsRadCor;
 
 
                         //And re-add materials for Win_Before/After_Mag with new angle setting
@@ -145,8 +145,8 @@ class XEMC
 			}
 			/*{{{ Intialize parameters and calculate Radiated Cross Section*/
 			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
-			Event->E_s=kE0*1000.;   //E0, in MeV
-			Event->E_p=kEp*1000.;   //Ep, in MeV
+			Event->E_s=kE0;   //E0, in GeV
+			Event->E_p=kEp;   //Ep, in GeV
 			Event->theta=kTheta; //Theta, in Deg
 			Event->Target.A = kA;
 			Event->Target.Z = kZ;
@@ -191,8 +191,8 @@ class XEMC
 				return -1;
 			}
 			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
-			Event->E_s=kE0*1000.;   //E0, in MeV
-			Event->E_p=kEp*1000.;   //Ep, in MeV
+			Event->E_s=kE0;   //E0, in GeV
+			Event->E_p=kEp;   //Ep, in GeV
 			Event->theta=kTheta; //Theta, in Deg
 
 			//And re-add materials for Win_Before/After_Mag with new angle setting
@@ -237,8 +237,8 @@ class XEMC
 				return -1;
 			}
 			Event->Init(); //Have to initilize every time to clear Win_Before/After_Mag
-			Event->E_s=kE0*1000.;   //E0, in MeV
-			Event->E_p=kEp*1000.;   //Ep, in MeV
+			Event->E_s=kE0;   //E0, in GeV
+			Event->E_p=kEp;   //Ep, in GeV
 			Event->theta=kTheta; //Theta, in Deg
 				tail = Event->tail;
 
@@ -345,20 +345,13 @@ class XEMC
 			D_y=atof(inputdata[k++].c_str());
 			beam_x=atof(inputdata[k++].c_str());
 			beam_y=atof(inputdata[k++].c_str());
-			//QFS model, not used in XEMC
-			IsQFS=atoi(inputdata[k++].c_str());
-			IsQFS_Q2dep=atoi(inputdata[k++].c_str());
-			Fermi_Moment=atof(inputdata[k++].c_str());
-			NIE=atof(inputdata[k++].c_str());
-			DEL_SEP=atof(inputdata[k++].c_str());
-			Form_Factor_Id=atoi(inputdata[k++].c_str());
+			XEMCFLAG=atoi(inputdata[k++].c_str());
+			IsRadCor=atoi(inputdata[k++].c_str());
 			IsInternal_Bre=atoi(inputdata[k++].c_str());
 			IsAppro=atoi(inputdata[k++].c_str());
 			IsExternal_Bre=atoi(inputdata[k++].c_str());
 			IsMulti_Photon_Cor=atoi(inputdata[k++].c_str());
-			IsRadCor=atoi(inputdata[k++].c_str());
 			DeltaE=atof(inputdata[k++].c_str());
-			XEMCFLAG=atoi(inputdata[k++].c_str());
 			//Add Target
 			Target_Name=inputdata[k++].c_str();
 			Target_Z=atoi(inputdata[k++].c_str());
@@ -381,7 +374,6 @@ class XEMC
 			Win_f_T=atof(inputdata[k++].c_str());
 			Win_f_rho=atof(inputdata[k++].c_str());
 			Target_Theta=atof(inputdata[k++].c_str());
-			IsBump=atoi(inputdata[k++].c_str());
 
 			//Target Chamber and other material before HRS magnetics
 			j=k;
@@ -416,13 +408,6 @@ class XEMC
 			Event->z0 = z0;
 			Event->T_L = T_L;
 			Event->T_H = T_H;
-			//QFS model, not used for XEMC model
-			Event->IsQFS = IsQFS;
-			Event->IsQFS_Q2dep = IsQFS_Q2dep;
-			Event->Fermi_Moment = Fermi_Moment;
-			Event->NIE = NIE;
-			Event->DEL_SEP = DEL_SEP;
-			Event->Form_Factor_Id = Form_Factor_Id;
 			Event->IsInternal_Bre = IsInternal_Bre;
 			Event->IsAppro = IsAppro;
 			Event->IsExternal_Bre = IsExternal_Bre;
@@ -437,7 +422,6 @@ class XEMC
 			Event->Target.T= Target_T;
 			Event->Target.rho= Target_rho;
 			Event->Target.L=T_L;//in HCS
-			Event->IsBump = IsBump;
 			//Target Cells
 			Event->Win_i.Name= Win_i_Name;
 			Event->Win_i.Z= Win_i_Z;
@@ -484,7 +468,8 @@ class XEMC
 		}
         /*}}}*/
 
-	private:
+	//private:
+	public:
 		/*DebugPrint(){{{*/
 		void DebugPrint()
 		{
@@ -501,18 +486,8 @@ class XEMC
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"z0",               10,z0,                       8,"cm",40,"(target center for Target Windows)");
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"T_L",              10,T_L,                      8,"cm",40,"(target length for Target Windowns)");
 			printf("%-*s=%*.2f %-*s %-*s\n",15,"T_H",              10,T_H,                      8,"cm",40,"(target height for Target Windowns)");
-			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsQFS " ,          10,IsQFS,                    8," ",40,"(QFS cross section model, default = false to use XEMC instead)");
-			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsQFS_Q2dep" ,     10,IsQFS_Q2dep,              8," ",40,"(QFS cross section model, not used in XEMC)");
-			printf("%-*s=%*.2f %-*s %-*s\n",15,"Fermi_Moment",     10,Fermi_Moment,             8,"MeV",40,"(fermi momentum of target for QFS model, not used in XEMC)");
-			printf("%-*s=%*.2f %-*s %-*s\n",15,"NIE",              10,NIE,                      8,"MeV",40,"(nucleon separation energy for QFS model, not used in XEMC)");
-			printf("%-*s=%*.2f %-*s %-*s\n",15,"DEL_SEP",          10,DEL_SEP,                  8,"MeV",40,"(delta separation energy for QFS model, not used in XEMC)");
-			printf("%-*s=%*.2d %-*s %-*s\n",15,"Form_Factor",      10,Form_Factor_Id,           8," ",40,"(for QFS model, not used in XEMC)");
-			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsInternal_Bre" ,  10,IsInternal_Bre,           8," ",40,"(for QFS model, not used in XEMC)");
-			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsAppro",          10,IsAppro,                  8," ",40,"(for QFS model, not used in XEMC)");
-			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsExternal_Bre",   10,IsExternal_Bre,           8," ",40,"(for QFS model, not used in XEMC)");
-			printf("%-*s=%*.1d %-*s %-*s\n",15,"Multi_Photon_Cor", 10,IsMulti_Photon_Cor,       8," ",40,"(for QFS model, not used in XEMC)");
 			printf("%-*s=%*.1d %-*s %-*s\n",15,"IsRadC" ,          10,IsRadCor,                 8," ",40,"(enable raditive correction)");
-			printf("%-*s=%*.2f %-*s %-*s\n",15,"DeltaE" ,          10,DeltaE,                   8," ",40,"(for QFS model, not used in XEMC)");
+			printf("%-*s=%*.2f %-*s %-*s\n",15,"DeltaE" ,          10,DeltaE,                   8," ",40,"(for radiative correction");
 			printf("%-*s=%*.1d %-*s %-*s\n",15,"XEMCFLAG" ,        10,XEMCFLAG,                 8," ",40,"(for XEMC model, 1->QE+DIS,2->QE only, 3->DIS only)");
 
 			//    printf("%-*s=%*.*s %-*s %-*s\n",15,"Target Name" ,       10,Target_Name,                   8," ",40,"");
@@ -558,20 +533,12 @@ class XEMC
 		double T_L;   //target length for generator(cm)
 		double T_H;   //target height for generator(cm)
 
-		bool IsBump; //For special treatment of long targets due to the bump issue  
-		bool IsQFS;    //QFS model flag, enable to calculate xs instead of XEMC.
-		bool IsQFS_Q2dep; //enable Q2 dependence when calculating Q.E. Peak
-		double Fermi_Moment;  //Fermi_Moment,fermi momentum of target (MeV)
-		double NIE;   //NIE,nucleon interaction energy (MeV)
-		double DEL_SEP;       //DEL_SEP,delta separation energy (MeV)
-
 		bool IsRadCor; //enable Radiative correction
 		double tail;
 		int XEMCFLAG;
         /*}}}*/
 
 		/*Only for Tail{{{*/
-		int Form_Factor_Id; //which form factor used
 		bool  IsInternal_Bre; //enable/disable internal bremsstrahlung
 		bool  IsExternal_Bre; //enable/disable external bremsstrahlung
 		bool  IsMulti_Photon_Cor; //enable/disable multiple photon correction

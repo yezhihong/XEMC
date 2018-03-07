@@ -18,18 +18,18 @@ bool IsGoodFlag(int kflag){
 
 //XEM_VAR3* XEMC_Born(double iE0set, double iEpset, double iTheta, XEM_TGT* iTarget)
 //Change to Double_t type to be called from outside
-//                         MeV             MeV           Deg
+//                         GeV             GeV           Deg
 Double_t XEMC_Born(double iE0set, double iEpset, double iTheta, int iA,int iZ,int iFlag)
 {
-  //The unit of XS is nb/(sr*MeV/c);
+  //The unit of XS is nb/(sr*GeV/c);
 
   //  XEM_VAR3* xs = new XEM_VAR3();
-  Double_t xs=0.0;
+  Double_t xs_all=0.0;
 
   //Bool_t bCCor = kFALSE; //Give an option to calculate Coulomb Correction
   Bool_t bCCor = kTRUE; //Only turn on the CC when calculating radiated cross section
-  Double_t E0 = iE0set*MeVToGeV; //MeV from SAMC
-  Double_t Ep = iEpset*MeVToGeV; //MeV from SAMC
+  Double_t E0 = iE0set; //GeV 
+  Double_t Ep = iEpset; //GeV
   Double_t Theta = iTheta*TMath::DegToRad();
   XEM_TGT* iTarget=new XEM_TGT();
   iTarget->GetValueAZ(iA,iZ);
@@ -38,18 +38,18 @@ Double_t XEMC_Born(double iE0set, double iEpset, double iTheta, int iA,int iZ,in
 //      iTarget->Print();
 
   //iFlag =1->QE+DIS, iFlag=2->QE Only, iFlag=3->DIS Only (F1F2IN09 or F2ALLM), iFlag==4->DIS Only (F1F2IN06) 
-  XEM_XS* XS_Born = new XEM_XS();  
+  XEM_XS* xs = new XEM_XS();  
 
   if(IsGoodFlag(iFlag)) 
-     gCal_Sigma(E0,Ep,Theta,iTarget,bCCor,iFlag,XS_Born);
+     gCal_Sigma(E0,Ep,Theta,iTarget,bCCor,iFlag,xs);
   else{
      cerr<< "******* Warning, Wrong XEMC Flag!!!"<<endl;
   }
     
-  xs = XS_Born->All;
+  xs_all = xs->All;
 
   delete iTarget;
-  delete XS_Born;
-  return xs;
+  delete xs;
+  return xs_all;
 }
 

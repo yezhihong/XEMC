@@ -1,6 +1,11 @@
 ////////////////////////////////////////////////////////////
 //      XEMC Radiation Cross Section Model                //
 //        -- Zhihong Ye, 06/14/2012                       //
+//                                                        //
+//  -- Update on 03/07/2018, Zhihong Ye,                  //
+//  Did a massive clean up to remove QFS model, unused    //
+//  subroutines, and fix the energy unit to be GeV, GeV/c //
+//                                                        //
 //Note:                                                   //
 //  The born cross section model is from XEMC_Born.h,that //
 //  I converted from old Fortran xem package into C++.    //
@@ -232,180 +237,31 @@ class XEMCEvent
 			//Basically we treat this system like two targets, each of which has different target lenght and 
 			//density, while all others remain the same. So in the caluclation, only m0.L, m0.rho,m0.TR,and m0.bt
 			//are need to be updated for each part.	--Z. Ye, 09/11/2012
-			/*if(IsBump){{{*/
-			if(IsBump){
-				//cerr<<"--- Doing special treatment for long targets! "<<endl;
-				//FIX_HERE, now we calculate the actual length from the reaction point 
-				double lL; //assume target is rentangle lL=distance between reactz_gen and edge of target
-				//in TRCS x plane<--> y plane in TCS
-				double Target_Boundary = -2.0 - z0; //Currently I take the boundary of two parts at -2cm //FIX_HERE, a potential bug since I am not sure the sign of z0, Z.YE9/19/2012
-				double rho_Up = 1.225;
-				double rho_Down = 0.85;
-				lL=target_edgepoint_TRCS(2)-lp_TRCS(2);//verticle distance between interaction point and edge plane of target
-				if ( lL>T_L ) {
-					Printf("target_edgepoint_TRCS(%g,%g,%g),lp_TRCS(%g,%g,%g)",target_edgepoint_TRCS(0),target_edgepoint_TRCS(1),target_edgepoint_TRCS(2),lp_TRCS(0),lp_TRCS(1),lp_TRCS(2));
-				}
-				/*If the reaction point locates at the upstream part,which is densier, we need to treat the target as two independent parts{{{*/
-				if(lL>(target_edgepoint_TRCS(2)-Target_Boundary)){
-					lL*=tan(lphrad);
-					lL+=lp_TRCS(0);//x on edge
+            //Win_Before_Mag add Target
+            it=Win_Before_Mag.begin();
+            m0=Target;//target after interaction point added to Win_Before_Mag
+            double lL; //assume target is rentangle lL=distance between reactz_gen and edge of target
+            //in TRCS x plane<--> y plane in TCS
+            lL=target_edgepoint_TRCS(2)-lp_TRCS(2);//verticle distance between interaction point and edge plane of target
 
-					/*in the target and come out from the downstream edge of the target{{{*/
-					if ( fabs(lL)<fabs(target_edgepoint_TRCS(0)) ) {//HCS 0=x top view
-						//Win_Before_Mag add Target
-						it=Win_Before_Mag.begin();
+            if ( lL>T_L ) {
+                Printf("target_edgepoint_TRCS(%g,%g,%g),lp_TRCS(%g,%g,%g)",target_edgepoint_TRCS(0),target_edgepoint_TRCS(1),target_edgepoint_TRCS(2),lp_TRCS(0),lp_TRCS(1),lp_TRCS(2));
+            }
+            lL*=tan(lphrad);
+            lL+=lp_TRCS(0);//x on edge
 
-						//Add Upstream Part
-						m0=Target;	
-						m0.L=T_L - (target_edgepoint_TRCS(2)-Target_Boundary);    //FIX_HERE, from -10cm to -2cm, target is denser but final number need to conform
-						m0.rho*=rho_Up; //FIX_HERE, final density are need to conform. 
-						m0.T=m0.L*m0.rho;
-						m0.bt=b(m0.Z)*m0.T/m0.X0;
-						lL=fabs((lp_TRCS(2)-Target_Boundary)/cos(lphrad));//The length from the boundary to the reaction points in the dense area.
-						m0.L=lL;
-						Win_Before_Mag.insert(it,m0);
-						FirstInWinBeforeMagBlock++;
+            if ( fabs(lL)<fabs(target_edgepoint_TRCS(0)) ) {//HCS 0=x top view
+                //in the target
+                lL=fabs((target_edgepoint_TRCS(2)-lp_TRCS(2))/cos(lphrad));
+            }
+            else {
+                //out of target before hiting the edge of target, the edge means the downstream face.
+                lL=fabs((target_edgepoint_TRCS(0)-lp_TRCS(0))/sin(lphrad));
+            }
 
-						Target_Up_TR = fabs(lp_TRCS(2)+T_L/2.0+z0)*m0.rho/m0.X0;
-						Target_Up_bt =b(m0.Z)*Target_Up_TR;
-						Target_Down_TR = m0.L*m0.rho/m0.X0;
-						Target_Down_bt = b(m0.Z)*Target_Down_TR;
-						it++;
-						//Add Downstream Part
-						m0=Target;
-						m0.L=target_edgepoint_TRCS(2)-Target_Boundary;   //FIX_HERE, need to conform
-						m0.rho*=rho_Down;//FIX_HERE, need to conform
-						m0.T=m0.L*m0.rho;
-						m0.bt=b(m0.Z)*m0.T/m0.X0;
-						lL=fabs((target_edgepoint_TRCS(2)-Target_Boundary)/cos(lphrad));//The length from the boundary to the reaction points in the dense area.
-						m0.L=lL;
-						Win_Before_Mag.insert(it,m0);
-						FirstInWinBeforeMagBlock++;
-
-						Target_Down_TR += m0.L*m0.rho/m0.X0;
-						Target_Down_bt += b(m0.Z)*Target_Down_TR;
-					}/*}}}*/
-					/*out of target before hiting the edge of target, the edge means the downstream face{{{*/
-					else {
-						//Add Upstream Part
-						m0=Target;	
-						m0.L=T_L - (target_edgepoint_TRCS(2)-Target_Boundary);    //FIX_HERE, from -10cm to -2cm, target is denser but final number need to conform
-						m0.rho*=rho_Up; //FIX_HERE, final density are need to conform. 
-						m0.T=m0.L*m0.rho;
-						m0.bt=b(m0.Z)*m0.T/m0.X0;
-
-						lL=fabs((lp_TRCS(2)-Target_Boundary)/cos(lphrad));//The length from the boundary to the reaction points in the dense area.
-						/*If the particle goes out before goes into the downstream part{{{*/
-						if(lL*sin(lphrad)>fabs((target_edgepoint_TRCS(0)-lp_TRCS(0))/sin(lphrad))){
-							lL=fabs((target_edgepoint_TRCS(0)-lp_TRCS(0))/sin(lphrad));
-							m0.L=lL;	
-							Win_Before_Mag.insert(it,m0);
-							FirstInWinBeforeMagBlock++;
-
-							Target_Up_TR = fabs(lp_TRCS(2)+T_L/2.0+z0)*m0.rho/m0.X0;
-							Target_Up_bt =b(m0.Z)*Target_Up_TR;
-							Target_Down_TR = m0.L*m0.rho/m0.X0;
-							Target_Down_bt = b(m0.Z)*Target_Down_TR;
-						}/*}}}*/
-						/*If the particle travel through the downstream part, add both{{{*/
-						else{	
-							m0.L=lL;	
-							Win_Before_Mag.insert(it,m0);
-							FirstInWinBeforeMagBlock++;
-
-							Target_Up_TR = fabs(lp_TRCS(2)+T_L/2.0+z0)*m0.rho/m0.X0;
-							Target_Up_bt =b(m0.Z)*Target_Up_TR;
-							Target_Down_TR = m0.L*m0.rho/m0.X0;
-							Target_Down_bt = b(m0.Z)*Target_Down_TR;
-
-							it++;
-							//Add Downstream Part
-							m0=Target;
-							m0.L=target_edgepoint_TRCS(2)-Target_Boundary;   //FIX_HERE, need to conform
-							m0.rho*=rho_Down;//FIX_HERE, need to conform
-							m0.T=m0.L*m0.rho;
-							m0.bt=b(m0.Z)*m0.T/m0.X0;
-							lL=fabs((target_edgepoint_TRCS(0)-lp_TRCS(0))/sin(lphrad))-fabs((lp_TRCS(2)-Target_Boundary)/cos(lphrad));
-							if(lL>=0.0){//If the particle travel through downstream part before It get out, add this part, otherwise only consider the upstream part
-								m0.L=lL;
-								Win_Before_Mag.insert(it,m0);					
-								FirstInWinBeforeMagBlock++;
-								Target_Down_TR += m0.L*m0.rho/m0.X0;
-								Target_Down_bt += b(m0.Z)*Target_Down_TR;
-							}
-						}/*}}}*/
-					}/*}}}*/
-				}/*}}}*/
-				/*If the reaction happens at the downstream part, we only need to consider this part only, unless we have angle larger than 90deg, which we don't have{{{*/	
-				else{
-					//Add Upstream part
-					m0=Target;
-					m0.rho*=rho_Up;
-					Target_Up_TR = fabs(Target_Boundary+T_L/2.0+z0)*m0.rho/m0.X0;
-					Target_Up_bt =b(m0.Z)*Target_Up_TR;
-
-					//Add Downstream Part
-					m0=Target;
-					m0.L=target_edgepoint_TRCS(2)-Target_Boundary;   //FIX_HERE, need to conform
-					m0.rho*=rho_Down;//FIX_HERE, need to conform
-					m0.T=m0.L*m0.rho;
-					m0.bt=b(m0.Z)*m0.T/m0.X0;
-					//FIX_HERE, now we calculate the actual length from the reaction point 
-					//in TRCS x plane<--> y plane in TCS
-					lL=target_edgepoint_TRCS(2)-lp_TRCS(2);//verticle distance between interaction point and edge plane of target
-					if ( lL>T_L ) {
-						Printf("target_edgepoint_TRCS(%g,%g,%g),lp_TRCS(%g,%g,%g)",target_edgepoint_TRCS(0),target_edgepoint_TRCS(1),target_edgepoint_TRCS(2),lp_TRCS(0),lp_TRCS(1),lp_TRCS(2));
-					}
-					lL*=tan(lphrad);
-					lL+=lp_TRCS(0);//x on edge
-
-					if ( fabs(lL)<fabs(target_edgepoint_TRCS(0)) ) {//HCS 0=x top view
-						//in the target
-						lL=fabs((target_edgepoint_TRCS(2)-lp_TRCS(2))/cos(lphrad));
-					}
-					else {
-						//out of target before hiting the edge of target, the edge means the downstream face.
-						lL=fabs((target_edgepoint_TRCS(0)-lp_TRCS(0))/sin(lphrad));
-					}
-					m0.L=lL;
-					Win_Before_Mag.insert(it,m0);
-					FirstInWinBeforeMagBlock++;
-					Target_Up_TR += fabs(lp_TRCS(2)-Target_Boundary)*m0.rho/m0.X0;
-					Target_Up_bt += b(m0.Z)*Target_Up_TR;
-					Target_Down_TR = m0.L*m0.rho/m0.X0;
-					Target_Down_bt = b(m0.Z)*Target_Down_TR;
-				}/*End of downstream part only}}}*/
-
-			//	cerr<<Form("L=%f, TR_Up=%f, bt_Up=%f, TR_Down=%f, bt_Down=%f", lL,Target_Up_TR, Target_Up_bt, Target_Down_TR, Target_Down_bt)<<endl;
-			}/*End of special long target treatment}}}*/
-			//No Special Treatment
-			else{	
-				//Win_Before_Mag add Target
-				it=Win_Before_Mag.begin();
-				m0=Target;//target after interaction point added to Win_Before_Mag
-				double lL; //assume target is rentangle lL=distance between reactz_gen and edge of target
-				//in TRCS x plane<--> y plane in TCS
-				lL=target_edgepoint_TRCS(2)-lp_TRCS(2);//verticle distance between interaction point and edge plane of target
-
-				if ( lL>T_L ) {
-					Printf("target_edgepoint_TRCS(%g,%g,%g),lp_TRCS(%g,%g,%g)",target_edgepoint_TRCS(0),target_edgepoint_TRCS(1),target_edgepoint_TRCS(2),lp_TRCS(0),lp_TRCS(1),lp_TRCS(2));
-				}
-				lL*=tan(lphrad);
-				lL+=lp_TRCS(0);//x on edge
-
-				if ( fabs(lL)<fabs(target_edgepoint_TRCS(0)) ) {//HCS 0=x top view
-					//in the target
-					lL=fabs((target_edgepoint_TRCS(2)-lp_TRCS(2))/cos(lphrad));
-				}
-				else {
-					//out of target before hiting the edge of target, the edge means the downstream face.
-					lL=fabs((target_edgepoint_TRCS(0)-lp_TRCS(0))/sin(lphrad));
-				}
-
-				m0.L=lL;
-				Win_Before_Mag.insert(it,m0);
-				FirstInWinBeforeMagBlock++;
-			};
+            m0.L=lL;
+            Win_Before_Mag.insert(it,m0);
+            FirstInWinBeforeMagBlock++;
 
 			//Win_Before_Mag add Air before last material in the input file
 			imax=Win_Before_Mag.size();
@@ -501,27 +357,14 @@ class XEMCEvent
 
 			cs_M=sigma_M(E_s,Angle_Deg);
 
-			/*{{{Born Crosss Section Model*/
-			//NOTE: I replace the born cross section model with my own XEMC model 
-			//   -- Zhihong Ye 01/25/2012
-			//The unit of XS is nb/(sr*MeV/c);
-			if (IsQFS){
-				cs_qfs=sigma_qfs(Target.Z,Target.A,E_s,E_s-E_p,Angle_Deg,Fermi_Moment,NIE,IsQFS_Q2dep);//Q.E. Peak
-				cs_del=sigma_del(Target.Z,Target.A,E_s,E_s-E_p,Angle_Deg,Fermi_Moment,DEL_SEP);//Delta
-				cs_x=sigma_x(Target.A,E_s,E_s-E_p,Angle_Deg);//DIS
-				cs_r1500=sigma_resonance(1500.,Target.A,Target.Z,E_s,E_s-E_p,Angle_Deg,Fermi_Moment);//Resonace 1500 MeV
-				cs_r1700=sigma_resonance(1700.,Target.A,Target.Z,E_s,E_s-E_p,Angle_Deg,Fermi_Moment);//Resonace 1700 MeV
-				cs_2N=sigma_2N(Target.Z,Target.A,E_s,E_s-E_p,Angle_Deg,Fermi_Moment);//Dip region
-				cs_Born=cs_qfs+cs_del+cs_x+cs_r1500+cs_r1700+cs_2N;
-			}
-			else{ //ZYE
-				//Born Cross Section Model from XEM, Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only 4->DIS_F1F2IN06_XEM Only
-				cs_qe = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),2); 
-				cs_dis = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),3); 
-				cs_Born = cs_qe + cs_dis; 
-			}
-			cs_Final = cs_Born;
-			/*}}}*/
+            /*{{{Born Crosss Section Model*/
+            //The unit of XS is nb/(sr*MeV/c);
+            //Born Cross Section Model from XEM, Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only 4->DIS_F1F2IN06_XEM Only
+            cs_qe = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),2); 
+            cs_dis = XEMC_Born(E_s,E_p,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),3); 
+            cs_Born = cs_qe + cs_dis; 
+            cs_Final = cs_Born;
+            /*}}}*/
 
 			if ( IsRadCor && cs_Born >= 1e-13 )
 			{
@@ -541,19 +384,11 @@ class XEMCEvent
 				w_p=E_s/(1+2*E_s*sinsq_Angle/Target.M)-E_p; //A51
 				v_s=w_s/E_s; //A53
 				v_p=w_p/(E_p+w_p);
-				if(IsBump){
-					tb=Win_i.TR+Target_Up_TR;
-					ta=Win_f.TR+Target_Down_TR;
-					btb=Win_i.bt+Target_Up_bt;//b*tb
-					bta=Win_f.bt+Target_Down_bt;//b*ta
-				}
-				else{
-					tb=Win_i.TR+Target.TR/2;
-					ta=Win_f.TR+Target.TR/2;
-					btb=Win_i.bt+Target.bt/2;//b*tb
-					bta=Win_f.bt+Target.bt/2;//b*ta
-				}
-				E_s_min=E_p/(1-2*E_p*sinsq_Angle/Target.M);
+                tb=Win_i.TR+Target.TR/2;
+                ta=Win_f.TR+Target.TR/2;
+                btb=Win_i.bt+Target.bt/2;//b*tb
+                bta=Win_f.bt+Target.bt/2;//b*ta
+                E_s_min=E_p/(1-2*E_p*sinsq_Angle/Target.M);
 				E_p_max=E_s/(1+2*E_s*sinsq_Angle/Target.M);
 				/*}}}*/
                 
@@ -582,13 +417,12 @@ class XEMCEvent
 			if ( !IsMulti_Photon_Cor )
 				lmulti_photon_cor=1;
 
-			cs_p=sigma_p()*lmulti_photon_cor*MEV2SR_TO_NBARNSR;
-			cs_ex=sigma_ex()*lmulti_photon_cor*MEV2SR_TO_NBARNSR;
-			cs_b=sigma_b(cs_b_bt,cs_b_at)*lmulti_photon_cor*MEV2SR_TO_NBARNSR;
-			cs_b_bt *= lmulti_photon_cor*MEV2SR_TO_NBARNSR;
-			cs_b_at *= lmulti_photon_cor*MEV2SR_TO_NBARNSR;
-
-			cerr<<Form("--- Rad-Tail: mp_cor=%e,cs_p=%e,cs_ex=%e,cs_b=%e,cs_b_bt=%e,cs_b_at=%e --- ",mp_cor,cs_p,cs_ex,cs_b,cs_b_bt,cs_b_at)<<endl;
+			cs_p=sigma_p()*lmulti_photon_cor*GEV2SR_TO_NBARNSR;
+			cs_ex=sigma_ex()*lmulti_photon_cor*GEV2SR_TO_NBARNSR;
+			cs_b=sigma_b(cs_b_bt,cs_b_at)*lmulti_photon_cor*GEV2SR_TO_NBARNSR;
+			cs_b_bt *= lmulti_photon_cor*GEV2SR_TO_NBARNSR;
+			cs_b_at *= lmulti_photon_cor*GEV2SR_TO_NBARNSR;
+			//cerr<<Form("--- Rad-Tail: mp_cor=%e,cs_p=%e,cs_ex=%e,cs_b=%e,cs_b_bt=%e,cs_b_at=%e --- ",mp_cor,cs_p,cs_ex,cs_b,cs_b_bt,cs_b_at)<<endl;
 
 			double lcs_int=cs_ex;
 			if ( IsAppro )
@@ -899,8 +733,8 @@ class XEMCEvent
 		{
 			//Multiple-photon correction
 			//Phys.Rev.D 12,1884 (A58)
-			cerr<<Form(" --- In F_soft: 1=%e,2=%e,3=%e",
-					                   w_s/E_s,(btb+btr),w_p/(w_p+E_p))<<endl;
+			//cerr<<Form(" --- In F_soft: 1=%e,2=%e,3=%e",
+			//		                   w_s/E_s,(btb+btr),w_p/(w_p+E_p))<<endl;
 			return pow(w_s/E_s,btb+btr)*pow(w_p/(E_p+w_p),btb+btr);
 		}
 		/*}}}*/
@@ -1009,23 +843,13 @@ class XEMCEvent
 			double lQ2=4*aEs*aEp*sinsq_Angle;
 			double lsigma_q = 0.0;
 
-			/*Born Cross Section Model{{{*/
-			if(IsQFS){
-				lsigma_q=sigma_qfs(Target.Z,Target.A,aEs,aEs-aEp,Angle_Deg,Fermi_Moment,NIE,IsQFS_Q2dep);
-				lsigma_q+=sigma_del(Target.Z,Target.A,aEs,aEs-aEp,Angle_Deg,Fermi_Moment,DEL_SEP);//Delta
-				lsigma_q+=sigma_x(Target.A,aEs,aEs-aEp,Angle_Deg);//DIS
-				lsigma_q+=sigma_resonance(1500.,Target.A,Target.Z,aEs,aEs-aEp,Angle_Deg,Fermi_Moment);//Resonace 1500 MeV
-				lsigma_q+=sigma_resonance(1700.,Target.A,Target.Z,aEs,aEs-aEp,Angle_Deg,Fermi_Moment);//Resonace 1700 MeV
-				lsigma_q+=sigma_2N(Target.Z,Target.A,aEs,aEs-aEp,Angle_Deg,Fermi_Moment);//Dip region
-			}
-			else{
-				//Born Cross Section Model from XEM, 
-				//Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only, 4->DIS_F1F2IN06 Only,
-				//              5->QE_DIS+F2ALLM+Coulomb Correction
-				lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),5);
-			}
-			/*}}}*/
-			return _F(lQ2)*lsigma_q;
+            /*Born Cross Section Model{{{*/
+            //Born Cross Section Model from XEM, 
+            //Last Option : 1->QE+DIS_F2ALLM, 2->QE Only, 3->DIS_F2ALLM only, 4->DIS_F1F2IN06 Only,
+            //              5->QE_DIS+F2ALLM+Coulomb Correction
+            lsigma_q = XEMC_Born(aEs,aEp,Angle_Deg,(int)(Target.A+0.5),(int)(Target.Z+0.5),5);
+            /*}}}*/
+            return _F(lQ2)*lsigma_q;
 		}
 		/*}}}*/
 
@@ -1057,7 +881,7 @@ class XEMCEvent
 		double xi(const int& aZ,const double& aTb,const double& aTa)
 		{
 			//Phys.Rev.D 12,1884 A52
-			return PI*ELECTRON_MASS/2./ALPHA*(aTb+aTa)/((aZ+eta(aZ))*log(183.*pow(aZ,-1/3.)));
+			return PI*ELECTRON_MASS/2./ALPHA*(aTb+aTa)/((aZ+eta(aZ))*log(183.*pow(aZ,-1/3.))); //GeV
 		}
 		/*}}}*/
 
@@ -1228,9 +1052,9 @@ class XEMCEvent
 			double lK=0.307075;// cm^2/g for A=1 g/mol
 			double lbetasq=1-ELECTRON_MASS*ELECTRON_MASS/(aE0*aE0);
 			double lxi=lK/2*aMaterial.Z/aMaterial.A*aMaterial.T/lbetasq;//aT: g/cm^2
-			double lhbarwsq=28.816*28.816*aMaterial.rho*aMaterial.Z/aMaterial.A*1e-12;//MeV arho is density of absorber
+			double lhbarwsq=28.816*28.816*aMaterial.rho*aMaterial.Z/aMaterial.A*1e-15;//GeV arho is density of absorber
 			double j=0.200;
-			double Delta_p=lxi*(log(2*ELECTRON_MASS*lxi/lhbarwsq)+j);
+			double Delta_p=lxi*(log(2*ELECTRON_MASS*lxi/lhbarwsq)+j)*MeVToGeV;
 			double lw=4*lxi;
 			double result=0;
 			if ( aMaterial.Z!=0 && aMaterial.A!=0 && aMaterial.T!=0 && aMaterial.rho!=0 )
@@ -1239,7 +1063,7 @@ class XEMCEvent
 				result=aE0-ELECTRON_MASS;
 			if ( result<0 )
 				result=0;
-			return result;
+			return result; //GeV
 		}
 		/*}}}*/
 
@@ -1257,7 +1081,7 @@ class XEMCEvent
 				result=aE0-ELECTRON_MASS;
 			if ( result<0 )
 				result=0;
-			return result;
+			return result; //GeV
 		}
 		/*}}}*/
 
@@ -1363,356 +1187,6 @@ class XEMCEvent
 		}
 		/*}}}*/
 
-		/*double sigma_qfs(const int& aZ,const double& aA,const double& aE,const double& aomega,const double& aTheta,const double& aPF,const double& aEPS,const bool& aIsQ2dep=false){{{*/
-		double sigma_qfs(const int& aZ,const double& aA,const double& aE,const double& aomega,const double& aTheta,const double& aPF,const double& aEPS,const bool& aIsQ2dep=false)
-		{
-			//Q.E. Peak
-			//aE=MeV,aTheta=deg
-			//aPF: fermi momentum
-			//aEPS: nucleon interaction energy
-			double GAMR=120; //no idea
-			double PFR=230; //no idea
-			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*TMath::DegToRad()/2),2); //no idea
-			double QVSRQ=QMSRQ+115*115; //no idea
-			double AP0=840; //no idea
-			double AP1=750; //no idea
-			double AP;
-			int NA=(int)aA;
-			if ( NA==1 )
-				AP=AP0;
-			else if ( NA<4 )
-				AP=AP0+(aA-1)*(AP1-AP0)/3;
-			else
-				AP=AP1;
-			double lth=aTheta*TMath::DegToRad();
-			double lQ2=4*aE*(aE-aomega)*sin(lth/2)*sin(lth/2);
-			double lq3mSQ=lQ2+aomega*aomega;
-
-			double sigma_s=sigma_M(aE,aTheta)*Recoil(aE,aTheta,PROTON_MASS);
-			double sigma_p=pow(GEp(lQ2,AP),2)+tau(lQ2)*pow(GMp(lQ2,AP),2);
-			sigma_p /= (1+tau(lQ2));
-			sigma_p += 2*tau(lQ2)*pow(GMp(lQ2,AP),2)*pow(tan(lth/2),2);
-			sigma_p *= sigma_s;
-			double sigma_n=pow(GEn(lQ2,AP),2)+tau(lQ2)*pow(GMn(lQ2,AP),2);
-			sigma_n /= (1+tau(lQ2));
-			sigma_n += 2*tau(lQ2)*pow(GMn(lQ2,AP),2)*pow(tan(lth/2),2);
-			sigma_n *= sigma_s;
-
-			double lEp=4*aE*aE*sin(lth/2)*sin(lth/2)/(1+aE*(1-cos(lth))/PROTON_MASS);//Q2
-			lEp=lEp/(2*PROTON_MASS)+aEPS;//omega
-			lEp=aE-lEp;
-
-			double ARG,DEN,GAMQ,result;
-			if ( NA==1 )
-			{
-				ARG=(aE-aomega-lEp)/sqrt(2.);
-				DEN=2.51;
-			}
-			else
-			{
-				GAMQ=GAMR*aPF/PFR*sqrt(lq3mSQ)/sqrt(QVSRQ);
-				ARG=(aE-aomega-lEp)/(1.2*GAMQ/2);
-				DEN=2.13*(GAMQ/2);
-			}
-			int NQ=int(ARG);
-			if ( abs(NQ)>10 )
-				result=0;
-			else
-				result=(aZ*sigma_p+(aA-aZ)*sigma_n)*exp(-ARG*ARG)/DEN;
-			if ( aIsQ2dep )
-			{
-				double lpar[2];
-				lpar[0]=0.686704; //this is only work for carbon
-				lpar[1]=0.0453828; //this is only work for carbon
-				//if ( Target.Z==26 ) {//for iron
-				//      lpar[0]=1.0; //just satisfy the data
-				//      lpar[1]=0.0453828; //just satisfy the data
-				//}
-				double lCor=lpar[1]*1e6/lQ2+lpar[0];
-				result/=lCor;
-			}
-			return result;
-		}
-		/*}}}*/
-
-		/*double sigma_del(const double& aA,const double& aE,const double& aomega,const double& aTheta,const double& aPF,const double& aEPSD){{{*/
-		double sigma_del(const double& aZ, const double& aA,const double& aE,const double& aomega,const double& aTheta,const double& aPF,const double& aEPSD)
-		{
-			//Delta
-			//aE=MeV,aTheta=deg
-			//aPF: fermi momentum
-			//double AP0=840; //no idea
-			//double AP1=750; //no idea
-			double GAMR=120; //no idea
-			double PFR=230; //no idea
-			double QMSR=4.*730.*(730.-390.)*pow(sin(37.1*TMath::DegToRad()/2.),2);
-			double QVSR=QMSR+390.*390;
-			double QMSRQ=4*730.*(730-115.)*pow(sin(37.1*TMath::DegToRad()/2),2); //no idea
-			double QVSRQ=QMSRQ+115*115; //no idea
-			double QFDP=1.02e-7;//no idea
-			double GAMSPRD=140;
-			double GAMDP=110;
-			double GSPRDA;
-			double AD0=774;
-			double AD1=700;
-			double AD;
-			int NA=(int)aA;
-			if ( NA==1 )
-			{
-				GSPRDA=0;
-				AD=AD0;
-			}
-			else if ( NA<4 )
-			{
-				GSPRDA=(aA-1)*GAMSPRD/3.;
-				AD=AD0+(aA-1)*(AD1-AD0)/3.;
-			}
-			else
-			{
-				GSPRDA=GAMSPRD;
-				AD=AD1;
-			}
-			double lth=aTheta*TMath::DegToRad();
-			double lQ2=4*aE*(aE-aomega)*sin(lth/2)*sin(lth/2);
-			double lq3mSQ=lQ2+aomega*aomega;
-			double result;
-			double GAMQ;
-			if ( NA>1 )
-				GAMQ=GAMR*aPF*sqrt(lq3mSQ)/PFR/sqrt(QVSRQ);
-			else
-				GAMQ=0.;
-			double GAM=sqrt(GAMDP*GAMDP+GAMQ*GAMQ+GSPRDA*GSPRDA);
-			result=QFDP*(GAMDP/GAM);
-			double EKAPPA=aomega-lQ2/2./PROTON_MASS;
-			double CMTOT2=PROTON_MASS*PROTON_MASS+2*PROTON_MASS*EKAPPA;
-			result*=CMTOT2*GAM*GAM;
-			double DM=1219;
-			result/=(pow((CMTOT2-(DM+aEPSD)*(DM+aEPSD)),2)+CMTOT2*GAM*GAM);
-			result*=pow(FD(lQ2,AD),2)/pow(FD(QMSR,AD),2);
-			result*=lq3mSQ/QVSR;
-			result*=(lQ2/2./lq3mSQ+tan(lth/2.)*tan(lth/2));
-			result/=(QMSR/2./QVSR+pow(tan(37.1*TMath::DegToRad()/2.),2));
-			result*=sigma_M(aE,aTheta)/sigma_M(730,37.1);
-			double WTHRESH = 4.*aE*aE*sin(lth/2.)*sin(lth/2.)+PI_MASS*PI_MASS+2.*PI_MASS*PROTON_MASS;
-			WTHRESH /= 2.*PROTON_MASS;
-			double THRESHD = 1.+aPF/PROTON_MASS+aPF*aPF/2./PROTON_MASS/PROTON_MASS+2.*aE*sin(lth/2.)*sin(lth/2.)/PROTON_MASS;
-			WTHRESH = WTHRESH/THRESHD;
-			double THRESH;
-			double GAMPI=5;
-			if ( aomega>WTHRESH )
-				THRESH=1.-exp(-(aomega-WTHRESH)/GAMPI);
-			else
-				THRESH=0.;
-			result*=aA*THRESH;
-
-			return result*1e7; //output is nb/sr
-		}
-		/*}}}*/
-
-		/*double sigma_x(const double& aA,const double& aE,const double& aomega,const double& aTheta){{{*/
-		double sigma_x(const double& aA,const double& aE,const double& aomega,const double& aTheta)
-		{
-			//DIS
-			//aE=MeV,aTheta=deg
-			//aPF: fermi momentum
-
-			double SIG0=100.e-4;
-			double SIG1=54.*1.e-1;
-			double GAM0=650.;
-			double lth=aTheta*PI/180.;
-
-			double SIGEE=0;
-			if ( aomega>1e-5 )
-			{
-				double QMS=4.*aE*(aE-aomega)*pow(sin(lth/2.),2);
-				double ARG0=aomega-QMS/2./PROTON_MASS-PI_MASS-PI_MASS*PI_MASS/2./PROTON_MASS;
-				double ARG1=ARG0/GAM0;
-				double ARG=ARG1*ARG1/2.;
-				double SHAPE;
-				if ( ARG1>8 )
-					SHAPE=1.+SIG1/SIG0/ARG0;
-				else if ( ARG1<1E-5)
-					SHAPE=0;
-				else if ( ARG1<0.1 )
-					SHAPE=SIG1*ARG0/2./GAM0/GAM0/SIG0;
-				else
-					SHAPE=(1.-exp(-ARG))*(1.+SIG1/SIG0/ARG0);
-				double EKAPPA=aomega-QMS/2./PROTON_MASS;
-				double SIGGAM=SIG0*SHAPE;
-				double QS=QMS+aomega*aomega;
-				double EPS=1./(1.+2.*QS*tan(lth/2.)*tan(lth/2)/QMS);
-				double FLUX=ALPHA*EKAPPA*(aE-aomega)/2./PI/PI/QMS/aE/(1.-EPS);
-				if ( FLUX<1E-20 )
-					FLUX=0;
-				SIGEE=FLUX*SIGGAM*FPHENOM(QMS)*FPHENOM(QMS);
-				double lR=0.56*1.E6/(QMS+PROTON_MASS*PROTON_MASS);
-				double FACTOR1=1.+EPS*lR;
-				SIGEE*=FACTOR1;
-			}
-
-			return aA*SIGEE*1e7;// nbarn/sr
-		}
-		/*}}}*/
-
-		/*double sigma_2N(const int& aZ,const double& aA,const double& aE,const double& aomega,const double& aTheta,const double& aPF){{{*/
-		double sigma_2N(const int& aZ,const double& aA,const double& aE,const double& aomega,const double& aTheta,const double& aPF)
-		{
-			//Dip region
-			double lth=aTheta*TMath::DegToRad();
-			double DM=1232.;
-			double A2=550.;
-			//  double PFR=60.;
-			double GAM2N=20.;
-			//  double GAMQFR=40.;
-			double GAMREF=300.;
-			double GAMR=GAMREF;
-			double SIGREF=0.20e-7;
-			double QMSR=4.*596.8*(596.8-380.)*pow(sin(60.*TMath::DegToRad()/2.),2);
-			double QVSR=QMSR+380.*380;
-			double SIGKIN=0.5*sigma_M(596.8e0,60.);
-			SIGKIN=SIGKIN*(QMSR/2./QVSR+pow(tan(60.*TMath::DegToRad()/2.),2));
-			SIGKIN=SIGKIN*QVSR*pow(FD(QMSR,A2),2);
-			SIGKIN=SIGKIN*GAMR/GAMREF;
-			double SIGCON=SIGREF/SIGKIN;
-			double QMS=4.*aE*(aE-aomega)*pow(sin(lth/2.),2);
-			double QVS=QMS+aomega*aomega;
-			//    double GAMQF=GAMQFR*(aPF/PFR)*(sqrt(QVS)/sqrt(QVSR));
-			double EFFMASS=(PROTON_MASS+DM)/2.;
-			double SIG=(aZ*(aA-aZ)/aA)*sigma_M(aE,aTheta);
-			SIG=SIG*(QMS/2./QVS+pow(tan(lth/2.),2));
-			SIG=SIG*QVS*pow(FD(QMS,A2),2);
-			double EKAPPA=aomega-QMS/2./PROTON_MASS;
-			double CMTOT2=PROTON_MASS*PROTON_MASS+2.*PROTON_MASS*EKAPPA;
-			//GAM=sqrt(GAMR*GAMR+GAMQF*GAMQF);
-			double GAM=GAMR;
-			SIG=SIG*CMTOT2*GAM*GAM;
-			SIG=SIG/(pow((CMTOT2-EFFMASS*EFFMASS),2)+CMTOT2*GAM*GAM);
-			SIG=SIG*(GAMR/GAM)*SIGCON;
-			double result=SIG;
-			double WTHRESH=QMS/4./PROTON_MASS;
-			double THRESH;
-			if ( aomega>WTHRESH )
-				THRESH=1.-exp(-(aomega-WTHRESH)/GAM2N);
-			else
-				THRESH=0.;
-			result=result*THRESH;
-			return result*1e7; // nbarn/sr
-		}
-		/*}}}*/
-
-		/*double sigma_resonance(const double& aRes_Energy,const double& aA,const double& aE,const double& aomega,const double& aTheta,const double& aPF){{{*/
-		double sigma_resonance(const double& aRes_Energy,const double& aA,const double& aZ,const double& aE,const double& aomega,const double& aTheta,const double& aPF)
-		{
-			//resonace
-			double lth=aTheta*TMath::DegToRad();
-			double PFR=230.;
-			double EPSR=0.;
-			double AR0=0.;
-			double AR1=0.;
-			double QFRP=0.;
-			double VPHOTONE=0.;
-			if ( fabs(aRes_Energy-1500)<1e-3 )
-			{
-				AR0=1000.;
-				AR1=1000.;
-				QFRP=1.20e-7;
-				VPHOTONE=1240;
-			}
-			else if ( fabs(aRes_Energy-1700)<1e-3 )
-			{
-				AR0=1200.;
-				AR1=1200.;
-				QFRP=0.68e-7;
-				VPHOTONE=1520;
-			}
-			double GAMQFR=120.;
-			double GAMSPRD=140.;
-			double GAMR=110.;
-			double GAMPI=5.;
-			double QMSQFR=4.*730.*(730.-115.)*pow(sin(37.1*TMath::DegToRad()/2.),2);
-			double QVSQFR=QMSQFR+115.*115;
-			double QMSRR=4.*10000.*(10000.-VPHOTONE)*pow(sin(6.*TMath::DegToRad()/2.),2);
-			double QVSRR=QMSRR+VPHOTONE*VPHOTONE;
-			double SIGREF=pow(FD(QMSRR,AR0),2)*QVSRR;
-			SIGREF=SIGREF*(QMSRR/2./QVSRR+pow(tan(6.*TMath::DegToRad()/2.),2));
-			SIGREF=SIGREF*sigma_M(10000.e0,6.);
-			int NA=int(aA);
-			double QFR,GSPRDA,AR;
-			if ( NA==1 )
-			{
-				QFR=QFRP;
-				GSPRDA=0.;
-				AR=AR0;
-			}
-			else if ( NA<4 )
-			{
-				QFR=QFRP;
-				GSPRDA=(aA-1.)*GAMSPRD/3.;
-				AR=AR0+(aA-1.)*(AR1-AR0)/3.;
-			}
-			else
-			{
-				AR=AR1;
-				GSPRDA=GAMSPRD;
-				QFR=QFRP;
-			}
-			double QMS=4.*aE*(aE-aomega)*pow(sin(lth/2.),2);
-			double QVS=QMS+aomega*aomega;
-			double GAMQ;
-			if ( NA>1 )
-				GAMQ=GAMQFR*aPF*sqrt(QVS)/PFR/sqrt(QVSQFR);
-			else
-				GAMQ=0.;
-			double CMTOT2=PROTON_MASS*PROTON_MASS+2.*PROTON_MASS*aomega-QMS;
-			double WTHRESH=4.*aE*aE*pow(sin(lth/2.),2)+PI_MASS*PI_MASS+2.*PI_MASS*PROTON_MASS;
-			WTHRESH=WTHRESH/2./PROTON_MASS;
-			double THRESHD=1.+aPF/PROTON_MASS+aPF*aPF/2./PROTON_MASS/PROTON_MASS+2.*aE*pow(sin(lth/2.),2)/PROTON_MASS;
-			WTHRESH=WTHRESH/THRESHD;
-			double THRESH;
-			if ( aomega>WTHRESH)
-				THRESH=1.-exp(-(aomega-WTHRESH)/GAMPI);
-			else
-				THRESH=0.;
-			double EPR=aE-(aRes_Energy-PROTON_MASS)*(aRes_Energy+PROTON_MASS)/2./PROTON_MASS;
-			EPR=EPR/(1.+2.*aE*pow(sin(lth/2.),2)/PROTON_MASS);
-			EPR=EPR-EPSR;
-			//double WR=aE-EPR;
-			double GAM=sqrt(GAMR*GAMR+GAMQ*GAMQ+GSPRDA*GSPRDA);
-			double result;
-			result=QFR*(GAMR/GAM)/SIGREF;
-			result*=CMTOT2*GAM*GAM;
-			result /= (pow((CMTOT2-(aRes_Energy+EPSR)*(aRes_Energy+EPSR)),2)+CMTOT2*GAM*GAM);
-			result*=QVS*pow(FD(QMS,AR),2);
-			result*=(QMS/2./QVS+pow(tan(lth/2.),2));
-			result*=sigma_M(aE,aTheta);
-			result*=aA*THRESH;
-			return result*1e7; // nbarn/sr
-		}
-		/*}}}*/
-
-		/*double FPHENOM(const double& aQ2){{{*/
-		double FPHENOM(const double& aQ2)
-		{
-			double A1=.55;
-			double A2=20./1.E6;
-			double B1=.45;
-			double B2=.45/1.E6;
-			double C1=0.03;
-			double C2=0.2/1.E12;
-			double result=A1*exp(-A2*aQ2)+B1*exp(-B2*aQ2);
-			result+=C1*exp(-C2*pow((aQ2-4.5E6),2));
-			result=sqrt(result);
-			return result;
-		}
-		/*}}}*/
-
-		/*double FD(const double& aQ2,const double aA){{{*/
-		double FD(const double& aQ2,const double aA)
-		{
-			return 1/pow((1+aQ2/(aA*aA)),2);
-		}
-		/*}}}*/
-
 		/*double sigma_M(const double& aE,const double& aTheta){{{*/
 		double sigma_M(const double& aE,const double& aTheta)
 		{
@@ -1724,67 +1198,10 @@ class XEMCEvent
 				mott=pow(ALPHA*cos(ltheta)/(2*aE*pow(sin(ltheta),2)),2);
 			else
 				mott=0;
-			return mott*MEV2SR_TO_NBARNSR; //nbarn
+			return mott*GEV2SR_TO_NBARNSR; //nbarn
 			//return mott; //nbarn
 		}
 		/*}}}*/
-
-		/*double Recoil(const double& aE,const double& aTheta,const double& aM){{{*/
-		double Recoil(const double& aE,const double& aTheta,const double& aM)
-		{
-			return 1/(1+aE*(1-cos(aTheta*TMath::DegToRad()))/aM);
-		}
-		/*}}}*/
-
-		/*double GEp(const double& aQ2,const double aPar){{{*/
-		double GEp(const double& aQ2,const double aPar)
-		{
-			return 1/pow((1+aQ2/(aPar*aPar)),2);
-		}
-		/*}}}*/
-
-		/*double GEn(const double& aQ2,const double aPar){{{*/
-		double GEn(const double& aQ2,const double aPar)
-		{
-			double result = -MU_N;
-			result = result * tau(aQ2)/( 1.0+5.6*tau(aQ2) );
-			result = result * GEp(aQ2,aPar);
-			return result;
-		}
-		/*}}}*/
-
-		/*double GMp(const double& aQ2,const double aPar){{{*/
-		double GMp(const double& aQ2,const double aPar)
-		{
-			return MU_P * GEp(aQ2,aPar);
-		}
-		/*}}}*/
-
-		/*double GMn(const double& aQ2,const double aPar){{{*/
-		double GMn(const double& aQ2,const double aPar)
-		{
-			return MU_N * GEp(aQ2,aPar);
-		}
-		/*}}}*/
-
-		/*double tau(const double& aQ2){{{*/
-		double tau(const double& aQ2)
-		{
-			return aQ2/4/(PROTON_MASS*PROTON_MASS); //PROTON_MASS
-		}
-		/*}}}*/
-
-
-		/*double PROD_AND(const double& ax,const double& ay){{{*/
-		double PROD_AND(const double& ax,const double& ay)
-		{
-			double prod;
-			prod=TMath::Min(ax,ay);
-			//prod=ax+ay-sqrt(ax*ax+ay*ay);
-			return prod;
-		}
-		/*}}}*/
-
 
 	public:
 		//Not safe, but it's ok for physicsists
@@ -1810,12 +1227,6 @@ class XEMCEvent
 		double cs_dis; //Radiated Cross Section if inlucding rediative effect
 
 		/*only for RadCor{{{*/
-		double cs_qfs;//quasi-free scattering cross section
-		double cs_del;//Delta
-		double cs_x;  //DIS
-		double cs_r1500; //Resonace 1500 MeV
-		double cs_r1700; //Resonace 1700 MeV
-		double cs_2N; //Dip region
 		double cs_q;//sum of all the cross section above
 
 
@@ -1844,19 +1255,8 @@ class XEMCEvent
 		double z0;    //target center for generator(cm)
 		double T_L;   //target length for generator(cm)
 		double T_H;   //target height for generator(cm)
-		double Fermi_Moment;  //Fermi_Moment,fermi momentum of target (MeV)
-		double NIE;   //NIE,nucleon interaction energy (MeV)
-		double DEL_SEP;       //DEL_SEP,delta separation energy (MeV)
 
 		bool IsRadCor; //enable Radiative correction
-		bool IsQFS; //enable QFS to calcualte xs instead of XEMC
-		bool IsQFS_Q2dep; //enable Q2 dependence when calculating Q.E. Peak
-		bool IsBump; 
-		double Target_Up_bt;
-		double Target_Up_TR;
-		double Target_Down_bt;
-		double Target_Down_TR;
-
 
 		/*Only for T ail{{{*/
 		int Form_Factor_Id; //which form factor used

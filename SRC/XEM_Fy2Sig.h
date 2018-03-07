@@ -1,8 +1,8 @@
-inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget, XEM_SIG* fy2sig)
+inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget, XEM_SIG* fy2sig)/*{{{*/
 {
   /*Info{{{*/
   /*
-    Subroutine to compute sigma (nb/sr/MeV) from Y-scaling model. This subroutine
+    Subroutine to compute sigma (nb/sr/GeV) from Y-scaling model. This subroutine
     is derived from the subroutine FTOSIG by R. McKeown. It uses the same
     basic method, but calculates the scaling variable Y from a different
     formula, in which the separation energy is used to calculate the mass
@@ -44,9 +44,9 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
   Double_t nu = aE0 - aEp;
   Double_t Qv2 = Qsq + nu*nu;
   Double_t Qv = sqrt(Qv2);
-  //Double_t x_local = Qsq/2.0/P_MASS/nu;
+  //Double_t x_local = Qsq/2.0/PROTON_MASS/nu;
   //Double_t y = nu/aEp;
-  //Double_t Wsq = -Qsq + P_MASS*P_MASS + 2.0*P_MASS*nu;
+  //Double_t Wsq = -Qsq + PROTON_MASS*PROTON_MASS + 2.0*PROTON_MASS*nu;
   //Double_t Elastic_Peak = aE0/(1.0+2.0*aE0*SN_SQ/aTarget_Mass);
 
   //Calculate Mott Cross Section
@@ -66,8 +66,8 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
    if(aTarget->A > 1.5){
     XEM_VAR2* sig_np = new XEM_VAR2();
     gGet_Sig_Bar_DF(aE0,aEp,aTheta,y_cal,0.0,sig_np);
-    sig_p = sig_np->First/1000.0;
-    sig_n = sig_np->Second/1000.0;
+    sig_p = sig_np->First;
+    sig_n = sig_np->Second;
     fact = (aTarget->Z*sig_p+(aTarget->A-aTarget->Z)*sig_n)/dwdy;
     delete sig_np;
    }
@@ -134,10 +134,10 @@ inline void gCal_Fy2Sig( double aE0,double aEp, double aTheta, XEM_TGT* aTarget,
   fy2sig->Value = sig_out;
   fy2sig->Factor = fact;
   return;
- }
+ }/*}}}*/
 
 //Calculate Y-Scaling variable
-inline Double_t gGet_Y(double vE0, double vEp, double vTheta, XEM_TGT* vTarget)
+inline Double_t gGet_Y(double vE0, double vEp, double vTheta, XEM_TGT* vTarget)/*{{{*/
 {
   Double_t nu = vE0 - vEp;
   Double_t SN_Theta = sin(vTheta/2.0);
@@ -150,7 +150,7 @@ inline Double_t gGet_Y(double vE0, double vEp, double vTheta, XEM_TGT* vTarget)
   Double_t Mass_A = vTarget->Mass;
 
   Double_t y_cal=0.0;
-  Double_t Mrec = P_MASS;
+  Double_t Mrec = PROTON_MASS;
   Double_t Mass_A_1 = Mass_A + vTarget->ESep - Mrec; //Mass of (A-1) system
   Double_t temp, coeff_a, coeff_b, coeff_c,root2;
   
@@ -166,9 +166,9 @@ inline Double_t gGet_Y(double vE0, double vEp, double vTheta, XEM_TGT* vTarget)
     y_cal = -(coeff_b+sqrt(root2))/(2.0*coeff_a);
 
   return y_cal;    
-}
+}/*}}}*/
 
-inline Double_t gGet_Fy(double vY, XEM_TGT* vTarget)
+inline Double_t gGet_Fy(double vY, XEM_TGT* vTarget)/*{{{*/
 {
   Double_t fy,y,f0,B,alpha,a,b;
   y=1000.0*vY;
@@ -186,9 +186,9 @@ inline Double_t gGet_Fy(double vY, XEM_TGT* vTarget)
   fy*=1000.0;
  
   return fy;
-}
+}/*}}}*/
 
-inline Double_t gGet_He3_Fy( double vY, XEM_TGT* vTarget){
+inline Double_t gGet_He3_Fy( double vY, XEM_TGT* vTarget){/*{{{*/
   //This is a special function for He3 only to prevent the He3 Fy falls to zero quickly when x->3
   // -- Z. Ye, 05/19/2014
   Double_t fy,y,f0,B,alpha,a,b;
@@ -207,9 +207,9 @@ inline Double_t gGet_He3_Fy( double vY, XEM_TGT* vTarget){
   fy = 1000.0*(f0-B)*alpha*alpha*exp(-(a*y)*(a*y))/(alpha*alpha+y*y)+B*exp(-(b*y)*(b*y));
 
   return fy;
-}
+}/*}}}*/
 
-inline void gGet_Sig_Bar_DF(double vE0,double vEp,double vTheta, double vY,double vPt,XEM_VAR2* sig_pn)
+inline void gGet_Sig_Bar_DF(double vE0,double vEp,double vTheta, double vY,double vPt,XEM_VAR2* sig_pn)/*{{{*/
 {
   Double_t CS_Theta = cos(vTheta/2.0);
   Double_t SN_Theta = sin(vTheta/2.0);
@@ -220,7 +220,7 @@ inline void gGet_Sig_Bar_DF(double vE0,double vEp,double vTheta, double vY,doubl
   
   Double_t Qsq = 4.0*vE0*vEp*SN_SQ; //4-momentum
   Double_t nu = vE0 - vEp;
-  Double_t Tau =Qsq/(4.0*P_MASS*P_MASS);
+  Double_t Tau =Qsq/(4.0*PROTON_MASS*PROTON_MASS);
   Double_t Qv2 = Qsq + nu*nu; //3-Momentum
   Double_t Qv = sqrt(Qv2);
   Double_t vYp = vY*vY + vPt*vPt;
@@ -262,9 +262,9 @@ inline void gGet_Sig_Bar_DF(double vE0,double vEp,double vTheta, double vY,doubl
   sig_pn->First = sig_p;
   sig_pn->Second = sig_n;
   return;
-}
+}/*}}}*/
 
-inline void gGet_FF(int vFlag, double vQsq, double* vFF)
+inline void gGet_FF(int vFlag, double vQsq, double* vFF)/*{{{*/
 {
 
 /* Converted from nform_xem.f
@@ -518,9 +518,9 @@ C  ------------------------------------------------------------
   vFF[3] = GMN;
   return;
 }//inline void gGet_FF(double vFlag, double vQsq, double* vFF)
+/*}}}*/
 
-
-inline Double_t gGet_Tail_Corr(Int_t kA,Double_t kX)
+inline Double_t gGet_Tail_Corr(Int_t kA,Double_t kX)/*{{{*/
 {
    Double_t aa=1.;
    Double_t bb=0.;
@@ -586,4 +586,4 @@ inline Double_t gGet_Tail_Corr(Int_t kA,Double_t kX)
 
      return tail_cor;
 }//inline Double_t gGet_Tail_Corr(Int_t kA,Double_t kX)
-
+/*}}}*/

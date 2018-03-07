@@ -6,23 +6,13 @@
 0.0            #D_y Y offset(cm in TCS) between TCS and HCS
 -0.2668        #Beam X Center (cm), -0.02668 for x>2
 0.30220        #Beam Y Center (cm), 0.03022 for x>2
-0              #Enable QFS cross section model to replace XEMC, default=false
-0              #Enable Q2dep when Calculating Q.E. Peak  (QFS model, default=false, not used in XEMC)
-200.00000      #Fermi_Moment,fermi momentum of target(MeV) (QFS model,not used in XEMC)
-25.000000      #NIE,nucleon interaction energy(MeV), shift QE central value (QFS model,not used in XEMC)
--10.00         #DEL_SEP,delta separation energy(MeV), shift delta central value (QFS model,not used in XEMC)
-17             #Which form factor: (QFS model,not used in XEMC)
-#                    1: Proton 2:He3 3:He4 4:deuterium 5: Point 6: Uniform 7: Gaussian 8: Exponential 
-#                    9: Shell 10: Hollow exponential 11: ...  12: Yukawa I 13: Yukawa II 
-#                   14: Hollow Gaussian 15: Generalized shell model 16: Modified exponential 
-#                   17: C/Fe/Pb (QFS model,not used in XEMC)
+1              #XEMC Model Flag, 1->QE+DIS, 2->QE only, 3->Dis only
+1              #Enable raditive correction (default=true)
 1              #Internal Bremsstrahlung 0/1 Disable/Enable (Calculate Elastic Tail)
 1              #Peak approximation of Internal Bremsstrahlung 0/1 Disable/Enable (Calculate Elastic Tail)
 1              #External Bremsstrahlung 0/1 Disable/Enable (Calculate Elastic Tail)
 1              #Multiple-Photon Correction 0/1 Disable/Enable (Calculate Elastic Tail)
-1              #Enable raditive correction (default=true)
-5.0            #DeltaE (MeV) only for Quasielastic radiative correction
-1              #XEMC Model Flag, 1->QE+DIS, 2->QE only, 3->Dis only
+0.005          #DeltaE (MeV) only for Quasielastic radiative correction
 #############Target
 H2             #Name
 1              #Z: Atomic Number

@@ -91,7 +91,8 @@ int main(int argc,char** argv){
 	//Define a event to calculate radiated cross section
 	XEMC* Event = new XEMC(); 
 	Event->Init(Target_Input.Data());
-    Event->SetTargetTable("./target.table");
+    //Event->SetTargetTable("./target.table");
+    Event->SetTargetTable("/work/halla/e08014/disk1/yez/XEMC/target.table");
 	Int_t err = -1;
 
 	err = Event->Process(E0,Ep,Theta,A,Z,0.0);	
