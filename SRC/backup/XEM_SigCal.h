@@ -1,10 +1,6 @@
 //                           GeV     GeV            Rad
 #include "DIS_Lite.h"
-<<<<<<< HEAD
-//#include "XEM_F1F2.h"
-=======
 #include "XEM_F1F2.h"
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
 //#include "christy_bosted_inelastic.h"
 inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool kCCor, int kFlag, XEM_XS* sig)
 {
@@ -44,6 +40,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   //   AUX(7) = alpha parameter for F(y)
   //       ______________________________________________________________________________*/
     
+    
   //Define Cross Section
   XEM_SIG* Sig_QE = new XEM_SIG();
   XEM_SIG* Sig_Donal = new XEM_SIG();
@@ -54,8 +51,8 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   XEM_VAR2 *W = new XEM_VAR2(); //store W1,W2 values
 
   /*Coulomb Correction{{{*/
-  //Get kDeltaE value 
-  Double_t kDeltaE = 0.0;
+  //Get DeltaE value 
+  Double_t DeltaE = 0.0;
   
   if(kCCor&&kFlag==5){
 // first get the vertex quantities and do a target dependent
@@ -67,37 +64,37 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
 // the 0.775 comes from Aste EPJ A 26 167 (2005)
 // also, all deltae_cc's are computed for Z-1, not Z!/-*    
     if(kTarget->A==1) //  !Hydrogen
-		kDeltaE = 0.0;
+		DeltaE = 0.0;
 	else if(kTarget->A==2) // !Deuterium
-		kDeltaE = 0.0;
+		DeltaE = 0.0;
 	else if(kTarget->A==3) // !Helium-3
-		kDeltaE = 0.0; //0.00085;
+		DeltaE = 0.0; //0.00085;
 	else if(kTarget->A==4) // !Helium-4
-		kDeltaE = 0.0; //0.0010;
+		DeltaE = 0.0; //0.0010;
 	else if(kTarget->A==9) // !Beryllium
-		kDeltaE = 0.001875;
+		DeltaE = 0.001875;
 	else if(kTarget->A==12) // !Carbon
-		kDeltaE = 0.00292;
+		DeltaE = 0.00292;
 	else if(kTarget->A==27) // !Aluminum
-		kDeltaE = 0.0061;
+		DeltaE = 0.0061;
 	else if(kTarget->A==40) // !Cacium-40
-		kDeltaE = 0.00743;
+		DeltaE = 0.00743;
 	else if(kTarget->A==48) // !Cacium-48
-		kDeltaE = 0.00699;
+		DeltaE = 0.00699;
 	else if(kTarget->A==64) // !Copper
-		kDeltaE = 0.0102;
+		DeltaE = 0.0102;
 	else if(kTarget->A==197) // !Gold
-		kDeltaE = 0.0199;
+		DeltaE = 0.0199;
 	else{
 		cerr<<"**** Target not in the list! Coulumb Correction give up~ "<<endl;
-		kDeltaE = 0.0;
+		DeltaE = 0.0;
 	}     
   }
   /*}}}*/
 
-  Double_t FF1 = (kE0 + kDeltaE)/kE0; //Fix the bug here, shoudl be kE0+... - ZYe 05/12/2014
-  Double_t E0_cc = kE0 + kDeltaE;
-  Double_t Ep_cc = kEp + kDeltaE;
+  Double_t FF1 = (kE0 + DeltaE)/kE0; //Fix the bug here, shoudl be kE0+... - ZYe 05/12/2014
+  Double_t E0_cc = kE0 + DeltaE;
+  Double_t Ep_cc = kEp + DeltaE;
 
   if(kFlag==1 || kFlag ==2 || kFlag ==5){
     if(kTarget->A > 1.5)
@@ -108,7 +105,73 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   }//if(kFlag==1 || kFlag ==2)
      
   sig_dis =0.0;
+  // DIS *dis = new DIS();
   if(kFlag==1 || kFlag ==3 || kFlag==4|| kFlag ==5){
+
+      /*OLD DIS FIT{{{*/
+      /*      if(kFlag==4){*/
+      //Double_t SN_Theta = sin(kTheta/2.0);
+      //Double_t SN_SQ = SN_Theta*SN_Theta;
+      //Double_t CS_Theta = cos(kTheta/2.0);
+      //Double_t TN_Theta = tan(kTheta/2.0);
+      //Double_t CS_SQ = CS_Theta*CS_Theta;
+
+      //Double_t aTarget_Mass = kTarget->Mass;
+      //Double_t Qsq = 4.0*E0_cc*Ep_cc*SN_SQ;
+      //Double_t nu = E0_cc - Ep_cc;
+      //Double_t xbj = Qsq/2.0/P_MASS/nu;
+      //Double_t y = nu/Ep_cc;
+      //Double_t Wsq = -Qsq + P_MASS*P_MASS + 2.0*P_MASS*nu;
+      //Double_t Elastic_Peak = E0_cc/(1.0+2.0*E0_cc*SN_SQ/aTarget_Mass);
+
+
+      //Double_t EMC_Corr=-1000., Frac=-1000.;
+      //Double_t pmax=1.0;
+      //Double_t x1 = 0.8, x2 = 0.9;
+      //Int_t innt=0,innp=0;
+      //if(kTarget->A>=2){//could be a bug, since gCal_DIS does not include A==2
+      //if(Wsq<2.25){
+      //innp = 30; innt = 30;
+      //}
+      //else{
+      //innp = 30; innt = 10; //There is a bug in the FORTRAN code, where in bdisnew4he3.f, innp=10,innt=30
+      //}
+      //if(kFlag==4){
+      //innp = 6; innt = 6; //Calculate Rad Integral with smaller steps to save time
+      //}
+
+      //gCal_DIS(E0_cc,Ep_cc,kTheta,kTarget,pmax,innt,innp,Sig_Donal);
+
+      //if(xbj<x1)
+      //EMC_Corr = gGet_EMC_Func(kTarget->A,xbj);
+      //else if(xbj>=x1 && xbj<x2){
+      //Frac = (xbj-x1)/(x2-x1);
+      //EMC_Corr = 1.0*Frac + gGet_EMC_Func(kTarget->A,xbj)*(1.0 - Frac);
+      //}
+      //else
+      //EMC_Corr = 1.0;   
+
+      //Double_t sig_dis_donal = Sig_Donal->Value*EMC_Corr;
+      //sig_dis = sig_dis_donal;
+      ////DEBUG
+      //}// if(iA>=2){
+      //else{
+      //gCal_F1F2In06(kTarget->A,kTarget->Z,Qsq,Wsq,F);
+      //W->First = F->First/P_MASS;
+      //W->Second = F->Second/nu;
+
+      //Double_t sig_mott = pow((19732.0/(2.0*137.0388*E0_cc*SN_SQ)),2)*pow(CS_SQ,2)/1e6;
+      //sig_dis = sig_mott*(W->Second+2.0*W->First*pow(TN_Theta,2));
+      //} //if(iA<2){
+
+      ////Do a high x tweak for the inelastic part of nuc targets
+      //if(xbj>0.9 && kTarget->A>1.5)
+      //sig_dis*=gGet_Dis_HighX_Cor(kTarget->A,xbj);
+
+      //if(sig_dis<0.0)
+      //sig_dis = 0.0;
+      /*}*/
+      /*}}}*/
 
           if(kFlag==1 || kFlag==3|| kFlag ==5){
               //F1F2 Fitting from P.Bosted,2009, a fortran code
@@ -116,10 +179,6 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
               //-- replaced with "DIS.h" which includes three DIS models, including PB,
               //and remove compiling the fortran code -- Zhihoong Ye, 05/30/2017
               /*Note: this needs the fortran PB code, not in used anymore{{{*/
-<<<<<<< HEAD
-              /*
-=======
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
               Double_t CS_Theta = cos(kTheta/2.0);
               Double_t SN_Theta = sin(kTheta/2.0);
               Double_t TN_Theta = tan(kTheta/2.0);
@@ -128,16 +187,6 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
 
               Double_t  Qsq = 4.0*E0_cc*Ep_cc*SN_SQ;
               Double_t nu = E0_cc - Ep_cc;
-<<<<<<< HEAD
-              Double_t Wsq = -Qsq + PROTON_MASS*PROTON_MASS + 2.0*PROTON_MASS*nu;
-
-              gCal_F1F2(kTarget->A,kTarget->Z,Qsq,Wsq,F); 
-              W->First = F->First/PROTON_MASS;
-              W->Second = F->Second/nu;
-              Double_t sig_mott = pow((19732.0/(2.0*137.0388*E0_cc*SN_SQ)),2)*pow(CS_SQ,1)/1e3;
-              sig_dis = sig_mott*(W->Second+2.0*W->First*pow(TN_Theta,2));
-              */
-=======
               Double_t Wsq = -Qsq + P_MASS*P_MASS + 2.0*P_MASS*nu;
               Double_t xbj = Qsq/2.0/P_MASS/nu;
 
@@ -147,24 +196,15 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
               Double_t sig_mott = pow((19732.0/(2.0*137.0388*E0_cc*SN_SQ)),2)*pow(CS_SQ,1)/1e6;
               sig_dis = sig_mott*(W->Second+2.0*W->First*pow(TN_Theta,2));
               //double sig_dis_temp= sig_dis;
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
               /*}}}*/
 
               //Using F2ALLM97 model:--Z. Ye 05/30/2017
-<<<<<<< HEAD
-              DIS_Lite *dis = new DIS_Lite();
-              dis->SetKin(kE0, kEp, kTheta);//GeV,GeV/c, Radius
-              sig_dis = dis->Sigma(kTarget->A, kTarget->Z);//nbarn/sr/GeV
-              delete dis;
-=======
-              /* DIS *dis = new DIS();*/
               //dis->SetKin(E0_cc, Ep_cc, kTheta);//GeV,GeV/c, Radius
               //Double_t Sigma_DIS = dis->Sigma(kTarget->A, kTarget->Z);//nbarn/sr/GeV
               //sig_dis = Sigma_DIS/1000.0; //nb/sr/MeV
-              /*delete dis;*/
 
-              //cout<<"x = "<<xbj<<" DIS_AM / DIS_PB = "<<sig_dis/sig_dis_temp<<endl;
->>>>>>> ca00fa49466f7e3edd4c4d0aa0feaf3c00867c8c
+              //cout<<"x = "<<xbj<<" DIS_PB / DIS_AM = "<<sig_dis_temp/sig_dis<<endl;
+              /*cout<<"x = "<<xbj<<" DIS_AM / DIS_PB = "<<sig_dis/sig_dis_temp<<endl;*/
 
               /*Christy&Bosted's DIS model, Need christy_bosted_inelastic.h{{{*/ //--Z. Ye 05/30/2017
               //double xs_p = sigma_p(kE0, kTheta, kEp);//Peter Bosted's DIS model
@@ -173,6 +213,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
               //if(kTarget->A==3&&kTarget->Z==1) sig_dis = xs_n + xs_d;
               //else if(kTarget->A==3&&kTarget->Z==2) sig_dis = xs_p + xs_d;
               //else sig_dis = kTarget->Z * xs_p + (kTarget->A-kTarget->Z)*xs_n;
+              //sig_dis /= 1000.0; //nb/sr/MeV
               /*}}}*/
 
               if(sig_dis<0.0||isnan(sig_dis)||isinf(sig_dis))
@@ -184,6 +225,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   }// if(kFlag==1 || kFlag ==3 || kFlag==4 || kFlag==5){
 
   delete F; delete W;
+  //delete dis;
 
   sig->Factor = Sig_QE->Factor;
   sig->QE = Sig_QE->Value;
@@ -202,7 +244,7 @@ inline void gCal_Sigma(double kE0,double kEp,double kTheta,XEM_TGT *kTarget,bool
   //==========================
     
 
-inline Double_t gGet_EMC_Func(Int_t aA, Double_t aXbj)/*{{{*/
+inline Double_t gGet_EMC_Func(Int_t aA, Double_t aXbj)
 {
   /*
     aji note:
@@ -256,9 +298,9 @@ inline Double_t gGet_EMC_Func(Int_t aA, Double_t aXbj)/*{{{*/
     }
  
   return emc;
-}//Double_t gGet_EMC_Func(...)/*}}}*/
+}//Double_t gGet_EMC_Func(...)
    
-inline Double_t gGet_EMC_Func_Slac(Int_t aA, Double_t aXbj)/*{{{*/
+inline Double_t gGet_EMC_Func_Slac(Int_t aA, Double_t aXbj)
 {
   Double_t aAlpha, aC, aTemp;
   
@@ -273,10 +315,10 @@ inline Double_t gGet_EMC_Func_Slac(Int_t aA, Double_t aXbj)/*{{{*/
   aC = exp(0.017 + 0.018*log(aXbj) + 0.005*pow(log(aXbj),2));
  
   return aC*pow(aTemp,aAlpha);
-}//Double_t gGet_EMC_Func_Slac(...)/*}}}*/
+}//Double_t gGet_EMC_Func_Slac(...)
 
 //For DIS cross section, make a correction at x->1 region
-inline Double_t gGet_Dis_HighX_Cor(Int_t aA, Double_t aXbj)/*{{{*/
+inline Double_t gGet_Dis_HighX_Cor(Int_t aA, Double_t aXbj)
 {
   Double_t x1_low = 0.9, x1_high = 0.95;
  // Double_t x2_low = 1.9, x2_high = 2.00;
@@ -318,5 +360,5 @@ inline Double_t gGet_Dis_HighX_Cor(Int_t aA, Double_t aXbj)/*{{{*/
   
   return cor; 
 }//Double gGet_Dis_HighX_Cor(...)
-    /*}}}*/
+    
     
